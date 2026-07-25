@@ -20,6 +20,9 @@ public sealed class ChatMessage
         SentAtUtc = sentAtUtc;
     }
 
+    // EF Core materialization only; EF cannot constructor-bind the Author navigation.
+    private ChatMessage() { Author = null!; Content = null!; }
+
     public Guid Id { get; }
     public Guid RoomId { get; }
     public MessageAuthor Author { get; }  // EF maps as owned/complex type later

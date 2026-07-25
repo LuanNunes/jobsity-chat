@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="NSubstitute" Version="6.0.0" />
@@ -23,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\com.jobsite.chat.Domain\com.jobsite.chat.Domain.csproj" />
     <ProjectReference Include="..\..\src\com.jobsite.chat.Service\com.jobsite.chat.Service.csproj" />
+    <ProjectReference Include="..\..\src\com.jobsite.chat.Repository\com.jobsite.chat.Repository.csproj" />
   </ItemGroup>
 
 </Project>
