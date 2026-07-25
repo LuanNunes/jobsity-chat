@@ -3,7 +3,7 @@ using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.Enums;
 using com.jobsite.chat.Domain.Rules;
 using com.jobsite.chat.Domain.ValueObjects;
-using com.jobsite.chat.Service.Abstractions;
+using com.jobsite.chat.Shared.Abstractions;
 using com.jobsite.chat.Service.Exceptions;
 using MediatR;
 

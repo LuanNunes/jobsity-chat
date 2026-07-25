@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\com.jobsite.chat.Domain\com.jobsite.chat.Domain.csproj" />
+    <ProjectReference Include="..\com.jobsite.chat.Shared\com.jobsite.chat.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

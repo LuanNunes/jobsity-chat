@@ -1,6 +1,6 @@
 using com.jobsite.chat.Domain.Entities;
 
-namespace com.jobsite.chat.Service.Abstractions;
+namespace com.jobsite.chat.Shared.Abstractions;
 
 // port implemented by Repository (EF) layer.
 public interface IChatMessageRepository

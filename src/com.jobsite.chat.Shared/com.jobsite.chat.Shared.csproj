@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\com.jobsite.chat.Service\com.jobsite.chat.Service.csproj" />
+    <ProjectReference Include="..\com.jobsite.chat.Domain\com.jobsite.chat.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

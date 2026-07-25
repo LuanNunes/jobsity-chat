@@ -1,5 +1,5 @@
 using com.jobsite.chat.Domain.Entities;
-using com.jobsite.chat.Service.Abstractions;
+using com.jobsite.chat.Shared.Abstractions;
 
 namespace com.jobsite.chat.Tests.Service.Fakes;
 

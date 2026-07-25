@@ -1,6 +1,6 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
-using com.jobsite.chat.Service.Abstractions;
+using com.jobsite.chat.Shared.Abstractions;
 using MediatR;
 
 namespace com.jobsite.chat.Service.Chat.GetLatestMessages;
