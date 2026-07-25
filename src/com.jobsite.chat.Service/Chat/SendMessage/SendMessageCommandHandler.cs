@@ -39,7 +39,8 @@ public sealed class SendMessageCommandHandler(
             case ChatInputKind.PlainMessage:
             default:
                 MessageAuthor author = MessageAuthor.User(request.AuthorUserId, request.AuthorDisplayName);
-                ChatMessage message = ChatMessage.Create(request.RoomId, author, request.Content, clock.GetUtcNow());
+                ChatMessage message = ChatMessage.Create(
+                    new NewChatMessage(request.RoomId, author, request.Content, clock.GetUtcNow()));
                 await messages.AddAsync(message, cancellationToken);
                 ChatMessageDto dto = new ChatMessageDto(
                     message.Id,

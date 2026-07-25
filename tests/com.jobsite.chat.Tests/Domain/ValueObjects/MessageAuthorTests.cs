@@ -94,4 +94,21 @@ public class MessageAuthorTests
     {
         Assert.Throws<DomainException>(() => MessageAuthor.Bot(new string('a', 101)));
     }
+
+    // rev. 3 spec §4.2 — two-field aggregation: both invalid fields reported in one message.
+    [Fact]
+    public void User_UserIdAndDisplayNameEmpty_ThrowsSingleDomainExceptionListingBothViolations()
+    {
+        DomainException exception = Assert.Throws<DomainException>(() => MessageAuthor.User("", ""));
+
+        Assert.Contains("'User Id'", exception.Message);
+        Assert.Contains("'Display Name'", exception.Message);
+    }
+
+    // rev. 3 spec §4.3 — null userId must throw, never silently coalesce into a valid bot.
+    [Fact]
+    public void User_NullUserId_ThrowsDomainExceptionAndDoesNotBecomeBot()
+    {
+        Assert.Throws<DomainException>(() => MessageAuthor.User(null!, "Ana"));
+    }
 }

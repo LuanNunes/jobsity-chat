@@ -1,3 +1,4 @@
+using FluentValidation;
 using com.jobsite.chat.Domain.Validation;
 
 namespace com.jobsite.chat.Domain.Entities;
@@ -19,12 +20,15 @@ public sealed class ChatRoom
     public string Name { get; }           // trimmed
     public DateTimeOffset CreatedAtUtc { get; }
 
+    private static readonly InlineValidator<ChatRoom> Rules = new()
+    {
+        v => v.RuleFor(r => r.Name).NotEmpty().MaximumLength(MaxNameLength),
+    };
+
     public static ChatRoom Create(string name, DateTimeOffset createdAtUtc)
     {
-        string validName = Ensure.MaxLength(
-            Ensure.NotNullOrWhiteSpace(name, nameof(name)),
-            MaxNameLength,
-            nameof(name));
-        return new ChatRoom(Guid.CreateVersion7(), validName, createdAtUtc);
+        ChatRoom room = new(Guid.CreateVersion7(), name?.Trim() ?? string.Empty, createdAtUtc);
+        Rules.ValidateAndThrowDomain(room);
+        return room;
     }
 }

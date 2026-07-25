@@ -1,3 +1,5 @@
+using FluentValidation;
+using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Validation;
 using com.jobsite.chat.Domain.ValueObjects;
 
@@ -24,14 +26,18 @@ public sealed class ChatMessage
     public string Content { get; }        // trimmed
     public DateTimeOffset SentAtUtc { get; }
 
-    public static ChatMessage Create(Guid roomId, MessageAuthor author, string content, DateTimeOffset sentAtUtc)
+    private static readonly InlineValidator<ChatMessage> Rules = new()
     {
-        Guid validRoomId = Ensure.NotEmpty(roomId, nameof(roomId));
-        MessageAuthor validAuthor = Ensure.NotNull(author, nameof(author));
-        string validContent = Ensure.MaxLength(
-            Ensure.NotNullOrWhiteSpace(content, nameof(content)),
-            MaxContentLength,
-            nameof(content));
-        return new ChatMessage(Guid.CreateVersion7(), validRoomId, validAuthor, validContent, sentAtUtc);
+        v => v.RuleFor(m => m.RoomId).NotEmpty(),
+        v => v.RuleFor(m => m.Author).NotNull(),
+        v => v.RuleFor(m => m.Content).NotEmpty().MaximumLength(MaxContentLength),
+    };
+
+    public static ChatMessage Create(NewChatMessage draft)
+    {
+        ChatMessage message = new(
+            Guid.CreateVersion7(), draft.RoomId, draft.Author!, draft.Content?.Trim() ?? string.Empty, draft.SentAtUtc);
+        Rules.ValidateAndThrowDomain(message);
+        return message;
     }
 }

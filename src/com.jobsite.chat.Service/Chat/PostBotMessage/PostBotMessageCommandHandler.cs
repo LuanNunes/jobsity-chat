@@ -23,7 +23,8 @@ public sealed class PostBotMessageCommandHandler(
         }
 
         MessageAuthor author = MessageAuthor.Bot(request.BotDisplayName);
-        ChatMessage message = ChatMessage.Create(request.RoomId, author, request.Content, clock.GetUtcNow());
+        ChatMessage message = ChatMessage.Create(
+            new NewChatMessage(request.RoomId, author, request.Content, clock.GetUtcNow()));
         await messages.AddAsync(message, cancellationToken);
         return new ChatMessageDto(
             message.Id,

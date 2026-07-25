@@ -1,3 +1,4 @@
+using FluentValidation;
 using com.jobsite.chat.Domain.Validation;
 
 namespace com.jobsite.chat.Domain.ValueObjects;
@@ -19,22 +20,23 @@ public sealed record MessageAuthor
     public string DisplayName { get; }    // trimmed
     public bool IsBot => UserId is null;
 
+    private static readonly InlineValidator<MessageAuthor> Rules = new()
+    {
+        v => v.RuleFor(a => a.DisplayName).NotEmpty().MaximumLength(MaxDisplayNameLength),
+        v => v.RuleFor(a => a.UserId).NotEmpty().When(a => a.UserId is not null),
+    };
+
     public static MessageAuthor User(string userId, string displayName)
     {
-        string id = Ensure.NotNullOrWhiteSpace(userId, nameof(userId));
-        string name = Ensure.MaxLength(
-            Ensure.NotNullOrWhiteSpace(displayName, nameof(displayName)),
-            MaxDisplayNameLength,
-            nameof(displayName));
-        return new MessageAuthor(id, name);
+        MessageAuthor author = new(userId?.Trim() ?? string.Empty, displayName?.Trim() ?? string.Empty);
+        Rules.ValidateAndThrowDomain(author);
+        return author;
     }
 
     public static MessageAuthor Bot(string displayName = DefaultBotName)
     {
-        string name = Ensure.MaxLength(
-            Ensure.NotNullOrWhiteSpace(displayName, nameof(displayName)),
-            MaxDisplayNameLength,
-            nameof(displayName));
-        return new MessageAuthor(null, name);
+        MessageAuthor author = new(null, displayName?.Trim() ?? string.Empty);
+        Rules.ValidateAndThrowDomain(author);
+        return author;
     }
 }

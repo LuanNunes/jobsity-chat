@@ -39,4 +39,13 @@ public class ChatRoomTests
         ChatRoom room = ChatRoom.Create(name, CreatedAt);
         Assert.Equal(name, room.Name);
     }
+
+    // rev. 3 spec §4.4 — trim precedes validation: padded 100-char name passes and stores trimmed.
+    [Fact]
+    public void Create_PaddedNameExactly100AfterTrim_SucceedsWithLength100()
+    {
+        string name = "  " + new string('a', 100) + "  ";
+        ChatRoom room = ChatRoom.Create(name, CreatedAt);
+        Assert.Equal(100, room.Name.Length);
+    }
 }

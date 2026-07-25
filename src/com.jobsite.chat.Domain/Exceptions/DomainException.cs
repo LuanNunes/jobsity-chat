@@ -1,4 +1,4 @@
 namespace com.jobsite.chat.Domain.Exceptions;
 
-// thrown by Ensure guards and domain factory methods.
+// thrown by domain factory validation.
 public class DomainException(string message) : Exception(message);
