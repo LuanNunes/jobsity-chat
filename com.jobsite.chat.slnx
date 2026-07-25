@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/com.jobsite.chat.Api/com.jobsite.chat.Api.csproj" />
+    <Project Path="src/com.jobsite.chat.Application/com.jobsite.chat.Application.csproj" />
+    <Project Path="src/com.jobsite.chat.Bot/com.jobsite.chat.Bot.csproj" />
+    <Project Path="src/com.jobsite.chat.Domain/com.jobsite.chat.Domain.csproj" />
+    <Project Path="src/com.jobsite.chat.Repository/com.jobsite.chat.Repository.csproj" />
+    <Project Path="src/com.jobsite.chat.Shared/com.jobsite.chat.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/com.jobsite.chat.Tests/com.jobsite.chat.Tests.csproj" />
+  </Folder>
+</Solution>

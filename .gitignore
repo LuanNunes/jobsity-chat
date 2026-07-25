@@ -1,0 +1,8 @@
+# Personal Claude Code preferences
+CLAUDE.local.md
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
