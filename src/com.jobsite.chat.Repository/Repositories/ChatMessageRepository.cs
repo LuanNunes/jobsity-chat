@@ -20,12 +20,13 @@ public sealed class ChatMessageRepository(ChatDbContext db) : IChatMessageReposi
             return [];
         }
 
-        List<ChatMessage> newestFirst = await db.Messages.AsNoTracking()
-            .Where(m => m.RoomId == roomId)
-            .OrderByDescending(m => m.SentAtUtc)
-            .ThenByDescending(m => m.Id)                     // => ascending after reverse (ties by Id asc)
-            .Take(count)
-            .ToListAsync(ct);
+        IQueryable<ChatMessage> newestFirstQuery =
+            from message in db.Messages.AsNoTracking()
+            where message.RoomId == roomId
+            orderby message.SentAtUtc descending, message.Id descending   // => ascending after reverse (ties by Id asc)
+            select message;
+
+        List<ChatMessage> newestFirst = await newestFirstQuery.Take(count).ToListAsync(ct);
 
         newestFirst.Reverse();                               // oldest->newest of the window
         return newestFirst;

@@ -145,7 +145,7 @@ namespace com.jobsite.chat.Repository.Persistence.Migrations.Identity
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("com.jobsite.chat.Repository.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("com.jobsite.chat.Domain.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -225,7 +225,7 @@ namespace com.jobsite.chat.Repository.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("com.jobsite.chat.Repository.Identity.ApplicationUser", null)
+                    b.HasOne("com.jobsite.chat.Domain.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -234,7 +234,7 @@ namespace com.jobsite.chat.Repository.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("com.jobsite.chat.Repository.Identity.ApplicationUser", null)
+                    b.HasOne("com.jobsite.chat.Domain.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -249,7 +249,7 @@ namespace com.jobsite.chat.Repository.Persistence.Migrations.Identity
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("com.jobsite.chat.Repository.Identity.ApplicationUser", null)
+                    b.HasOne("com.jobsite.chat.Domain.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -258,7 +258,7 @@ namespace com.jobsite.chat.Repository.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("com.jobsite.chat.Repository.Identity.ApplicationUser", null)
+                    b.HasOne("com.jobsite.chat.Domain.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

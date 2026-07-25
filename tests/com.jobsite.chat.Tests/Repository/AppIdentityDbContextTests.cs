@@ -1,4 +1,4 @@
-using com.jobsite.chat.Repository.Identity;
+using com.jobsite.chat.Domain.Identity;
 using com.jobsite.chat.Repository.Persistence;
 using Microsoft.EntityFrameworkCore;
 

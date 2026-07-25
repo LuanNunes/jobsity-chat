@@ -1,4 +1,4 @@
-using com.jobsite.chat.Repository.Identity;
+using com.jobsite.chat.Domain.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
