@@ -18,13 +18,7 @@ public sealed class GetLatestMessagesQueryHandler(IChatMessageRepository message
     {
         IReadOnlyList<ChatMessage> latest = await messages.GetLatestAsync(request.RoomId, MessageLimit, cancellationToken);
         return latest
-            .Select(message => new ChatMessageDto(
-                message.Id,
-                message.RoomId,
-                message.Author.DisplayName,
-                message.Content,
-                message.Author.IsBot,
-                message.SentAtUtc))
+            .Select(ChatMessageDto.FromEntity)
             .ToList();
     }
 }

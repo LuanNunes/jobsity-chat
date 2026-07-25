@@ -8,7 +8,7 @@ namespace com.jobsite.chat.Domain.ValueObjects;
 public sealed record MessageAuthor
 {
     public const string DefaultBotName = "StockBot";
-    public const int MaxDisplayNameLength = 100;
+    private const int MaxDisplayNameLength = 100;
 
     private MessageAuthor(string? userId, string displayName)
     {

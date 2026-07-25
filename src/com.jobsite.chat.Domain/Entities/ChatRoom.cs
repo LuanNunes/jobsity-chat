@@ -7,7 +7,7 @@ namespace com.jobsite.chat.Domain.Entities;
 // the private ctor, bypassing the factory guards.
 public sealed class ChatRoom
 {
-    public const int MaxNameLength = 100;
+    private const int MaxNameLength = 100;
 
     private ChatRoom(Guid id, string name, DateTimeOffset createdAtUtc)
     {

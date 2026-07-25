@@ -40,16 +40,10 @@ public sealed class SendMessageCommandHandler(
             default:
                 MessageAuthor author = MessageAuthor.User(request.AuthorUserId, request.AuthorDisplayName);
                 ChatMessage message = ChatMessage.Create(
-                    new NewChatMessage(request.RoomId, author, request.Content, clock.GetUtcNow()));
+                    NewChatMessageDto.Create(request.RoomId, author, request.Content, clock));
                 await messages.AddAsync(message, cancellationToken);
-                ChatMessageDto dto = new ChatMessageDto(
-                    message.Id,
-                    message.RoomId,
-                    message.Author.DisplayName,
-                    message.Content,
-                    message.Author.IsBot,
-                    message.SentAtUtc);
-                return new SendMessageResult(SendMessageOutcome.MessagePersisted, Message: dto);
+                return new SendMessageResult(
+                    SendMessageOutcome.MessagePersisted, Message: ChatMessageDto.FromEntity(message));
         }
     }
 }

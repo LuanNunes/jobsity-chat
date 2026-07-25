@@ -14,6 +14,6 @@ public sealed class GetRoomsQueryHandler(IChatRoomRepository rooms)
     public async Task<IReadOnlyList<ChatRoomDto>> Handle(GetRoomsQuery request, CancellationToken cancellationToken)
     {
         IReadOnlyList<ChatRoom> allRooms = await rooms.GetAllAsync(cancellationToken);
-        return allRooms.Select(room => new ChatRoomDto(room.Id, room.Name)).ToList();
+        return allRooms.Select(ChatRoomDto.FromEntity).ToList();
     }
 }

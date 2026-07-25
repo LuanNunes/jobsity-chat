@@ -35,8 +35,8 @@ public class GetLatestMessagesQueryHandlerTests
     {
         Guid roomId = Guid.NewGuid();
         DateTimeOffset sentAt = new DateTimeOffset(2026, 7, 25, 9, 0, 0, TimeSpan.Zero);
-        ChatMessage first = ChatMessage.Create(new NewChatMessage(roomId, MessageAuthor.User("u1", "Ana"), "first", sentAt));
-        ChatMessage second = ChatMessage.Create(new NewChatMessage(roomId, MessageAuthor.Bot(), "second", sentAt.AddMinutes(1)));
+        ChatMessage first = ChatMessage.Create(new NewChatMessageDto(roomId, MessageAuthor.User("u1", "Ana"), "first", sentAt));
+        ChatMessage second = ChatMessage.Create(new NewChatMessageDto(roomId, MessageAuthor.Bot(), "second", sentAt.AddMinutes(1)));
         _messages.GetLatestResult = new List<ChatMessage> { first, second };
         GetLatestMessagesQueryHandler handler = CreateHandler();
 

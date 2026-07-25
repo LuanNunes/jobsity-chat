@@ -15,6 +15,6 @@ public sealed class CreateRoomCommandHandler(IChatRoomRepository rooms, TimeProv
     {
         ChatRoom room = ChatRoom.Create(request.Name, clock.GetUtcNow());
         await rooms.AddAsync(room, cancellationToken);
-        return new ChatRoomDto(room.Id, room.Name);
+        return ChatRoomDto.FromEntity(room);
     }
 }

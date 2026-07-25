@@ -1,3 +1,5 @@
+using com.jobsite.chat.Domain.Entities;
+
 namespace com.jobsite.chat.Domain.Dtos;
 
 // plain output record mapped from a valid ChatMessage.
@@ -7,4 +9,14 @@ public sealed record ChatMessageDto(
     string AuthorDisplayName,
     string Content,
     bool IsFromBot,
-    DateTimeOffset SentAtUtc);
+    DateTimeOffset SentAtUtc)
+{
+    public static ChatMessageDto FromEntity(ChatMessage message)
+        => new(
+            message.Id,
+            message.RoomId,
+            message.Author.DisplayName,
+            message.Content,
+            message.Author.IsBot,
+            message.SentAtUtc);
+}

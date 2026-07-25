@@ -17,7 +17,7 @@ public class ChatMessageTests
         Guid roomId = Guid.NewGuid();
         MessageAuthor author = MessageAuthor.User("user-1", "Ana");
 
-        ChatMessage message = ChatMessage.Create(new NewChatMessage(roomId, author, "  hello  ", SentAt));
+        ChatMessage message = ChatMessage.Create(new NewChatMessageDto(roomId, author, "  hello  ", SentAt));
 
         Assert.Equal(roomId, message.RoomId);
         Assert.Same(author, message.Author);
@@ -29,7 +29,7 @@ public class ChatMessageTests
     [Fact]
     public void Create_ValidInput_GeneratesNonEmptyId()
     {
-        ChatMessage message = ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
+        ChatMessage message = ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
         Assert.NotEqual(Guid.Empty, message.Id);
     }
 
@@ -37,8 +37,8 @@ public class ChatMessageTests
     [Fact]
     public void Create_TwoMessages_GeneratesUniqueIds()
     {
-        ChatMessage a = ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
-        ChatMessage b = ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
+        ChatMessage a = ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
+        ChatMessage b = ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "hi", SentAt));
         Assert.NotEqual(a.Id, b.Id);
     }
 
@@ -47,7 +47,7 @@ public class ChatMessageTests
     public void Create_EmptyRoomId_ThrowsDomainException()
     {
         Assert.Throws<DomainException>(() =>
-            ChatMessage.Create(new NewChatMessage(Guid.Empty, MessageAuthor.User("u", "Ana"), "hi", SentAt)));
+            ChatMessage.Create(new NewChatMessageDto(Guid.Empty, MessageAuthor.User("u", "Ana"), "hi", SentAt)));
     }
 
     // Behavior 15
@@ -55,7 +55,7 @@ public class ChatMessageTests
     public void Create_NullAuthor_ThrowsDomainException()
     {
         Assert.Throws<DomainException>(() =>
-            ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), null!, "hi", SentAt)));
+            ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), null!, "hi", SentAt)));
     }
 
     // Behavior 15
@@ -66,7 +66,7 @@ public class ChatMessageTests
     public void Create_NullOrWhitespaceContent_ThrowsDomainException(string? content)
     {
         Assert.Throws<DomainException>(() =>
-            ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content!, SentAt)));
+            ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content!, SentAt)));
     }
 
     // Behavior 15
@@ -75,7 +75,7 @@ public class ChatMessageTests
     {
         string content = new string('x', 1001);
         Assert.Throws<DomainException>(() =>
-            ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt)));
+            ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt)));
     }
 
     // Behavior 15
@@ -83,7 +83,7 @@ public class ChatMessageTests
     public void Create_ContentExactly1000_Succeeds()
     {
         string content = new string('x', 1000);
-        ChatMessage message = ChatMessage.Create(new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt));
+        ChatMessage message = ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt));
         Assert.Equal(content, message.Content);
     }
 
@@ -92,7 +92,7 @@ public class ChatMessageTests
     public void Create_AllFieldsInvalid_ThrowsSingleDomainExceptionListingEveryViolation()
     {
         DomainException exception = Assert.Throws<DomainException>(() =>
-            ChatMessage.Create(new NewChatMessage(Guid.Empty, null!, "", DateTimeOffset.UtcNow)));
+            ChatMessage.Create(new NewChatMessageDto(Guid.Empty, null!, "", DateTimeOffset.UtcNow)));
 
         Assert.Contains("'Room Id'", exception.Message);
         Assert.Contains("'Author'", exception.Message);
@@ -105,7 +105,7 @@ public class ChatMessageTests
     {
         string content = "  " + new string('a', 1000) + "  ";
         ChatMessage message = ChatMessage.Create(
-            new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt));
+            new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt));
         Assert.Equal(1000, message.Content.Length);
     }
 
@@ -113,8 +113,8 @@ public class ChatMessageTests
     [Fact]
     public void Create_DraftDerivedWithExpression_SucceedsWithOverriddenContent()
     {
-        NewChatMessage baseDraft = new NewChatMessage(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "base", SentAt);
-        NewChatMessage derived = baseDraft with { Content = "derived" };
+        NewChatMessageDto baseDraft = new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), "base", SentAt);
+        NewChatMessageDto derived = baseDraft with { Content = "derived" };
 
         ChatMessage message = ChatMessage.Create(derived);
 

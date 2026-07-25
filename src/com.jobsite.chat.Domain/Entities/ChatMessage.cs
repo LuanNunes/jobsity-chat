@@ -9,7 +9,7 @@ namespace com.jobsite.chat.Domain.Entities;
 // the private ctor, bypassing the factory guards.
 public sealed class ChatMessage
 {
-    public const int MaxContentLength = 1000;
+    private const int MaxContentLength = 1000;
 
     private ChatMessage(Guid id, Guid roomId, MessageAuthor author, string content, DateTimeOffset sentAtUtc)
     {
@@ -33,7 +33,7 @@ public sealed class ChatMessage
         v => v.RuleFor(m => m.Content).NotEmpty().MaximumLength(MaxContentLength),
     };
 
-    public static ChatMessage Create(NewChatMessage draft)
+    public static ChatMessage Create(NewChatMessageDto draft)
     {
         ChatMessage message = new(
             Guid.CreateVersion7(), draft.RoomId, draft.Author!, draft.Content?.Trim() ?? string.Empty, draft.SentAtUtc);

@@ -23,15 +23,10 @@ public sealed class PostBotMessageCommandHandler(
         }
 
         MessageAuthor author = MessageAuthor.Bot(request.BotDisplayName);
-        ChatMessage message = ChatMessage.Create(
-            new NewChatMessage(request.RoomId, author, request.Content, clock.GetUtcNow()));
+        NewChatMessageDto newChatMessageDto =
+            NewChatMessageDto.Create(request.RoomId, author, request.Content, clock);
+        ChatMessage message = ChatMessage.Create(newChatMessageDto);
         await messages.AddAsync(message, cancellationToken);
-        return new ChatMessageDto(
-            message.Id,
-            message.RoomId,
-            message.Author.DisplayName,
-            message.Content,
-            message.Author.IsBot,
-            message.SentAtUtc);
+        return ChatMessageDto.FromEntity(message);
     }
 }

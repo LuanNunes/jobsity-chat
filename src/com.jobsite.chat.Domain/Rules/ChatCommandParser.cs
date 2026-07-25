@@ -23,25 +23,19 @@ public static class ChatCommandParser
     public static ChatCommandParseResult Parse(string? content)
     {
         string? trimmed = content?.Trim();
-        if (string.IsNullOrEmpty(trimmed))
+        if (string.IsNullOrEmpty(trimmed) || trimmed[0] != '/')
         {
             return ChatCommandParseResult.Plain();
         }
 
-        if (trimmed[0] != '/')
+        if (!trimmed.StartsWith(StockPrefix, StringComparison.OrdinalIgnoreCase))
         {
-            return ChatCommandParseResult.Plain();
+            return ChatCommandParseResult.Unknown();
         }
-
-        if (trimmed.StartsWith(StockPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-            string raw = trimmed[StockPrefix.Length..];
-            if (StockSymbol.TryCreate(raw, out StockSymbol? symbol))
-            {
-                return ChatCommandParseResult.Stock(symbol!);
-            }
-        }
-
-        return ChatCommandParseResult.Unknown();
+            
+        string raw = trimmed[StockPrefix.Length..];
+        return StockSymbol.TryCreate(raw, out StockSymbol? symbol) 
+            ? ChatCommandParseResult.Stock(symbol!)
+            : ChatCommandParseResult.Unknown();
     }
 }
