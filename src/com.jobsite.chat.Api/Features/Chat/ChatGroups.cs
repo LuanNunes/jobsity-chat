@@ -1,4 +1,4 @@
-namespace com.jobsite.chat.Api.Hubs;
+namespace com.jobsite.chat.Api.Features.Chat;
 
 // SignalR group-name centralization; hub + reply consumer share it.
 public static class ChatGroups

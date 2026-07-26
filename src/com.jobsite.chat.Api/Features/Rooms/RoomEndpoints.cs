@@ -1,9 +1,10 @@
 using com.jobsite.chat.Domain.Dtos;
+using com.jobsite.chat.Api.Exceptions;
 using com.jobsite.chat.Service.Chat.Commands;
 using com.jobsite.chat.Service.Chat.Queries;
 using MediatR;
 
-namespace com.jobsite.chat.Api.Endpoints;
+namespace com.jobsite.chat.Api.Features.Rooms;
 
 // JSON rooms surface (spec §2.4). The whole group requires auth; DomainException from the room-name
 // factory is converted to 400 problem+json by the group's DomainExceptionEndpointFilter.

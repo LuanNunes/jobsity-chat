@@ -12,7 +12,7 @@
   <Folder Name="/src/3 - Business/">
     <Project Path="src/com.jobsite.chat.Service/com.jobsite.chat.Service.csproj" />
   </Folder>
-  <Folder Name="/src/App/">
+  <Folder Name="/src/Api/">
     <Project Path="src/com.jobsite.chat.Api/com.jobsite.chat.Api.csproj" />
     <Project Path="src/com.jobsite.chat.Bot/com.jobsite.chat.Bot.csproj" />
   </Folder>

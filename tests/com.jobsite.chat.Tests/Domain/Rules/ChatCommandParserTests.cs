@@ -11,7 +11,7 @@ public class ChatCommandParserTests
     public void Parse_StockCommand_ReturnsStockCommandWithSymbol()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("/stock=aapl.us");
-        Assert.Equal(ChatInputKind.StockCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.StockCommand, result.KindEnum);
         Assert.NotNull(result.Symbol);
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
@@ -21,7 +21,7 @@ public class ChatCommandParserTests
     public void Parse_UpperCasePrefixAndSymbol_NormalizesToLowercaseStockCommand()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("/STOCK=AAPL.US");
-        Assert.Equal(ChatInputKind.StockCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.StockCommand, result.KindEnum);
         Assert.NotNull(result.Symbol);
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
@@ -31,7 +31,7 @@ public class ChatCommandParserTests
     public void Parse_LeadingAndTrailingWhitespace_TrimsAndReturnsStockCommand()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("  /stock=aapl.us  ");
-        Assert.Equal(ChatInputKind.StockCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.StockCommand, result.KindEnum);
         Assert.NotNull(result.Symbol);
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
@@ -43,7 +43,7 @@ public class ChatCommandParserTests
     public void Parse_StockPrefixWithoutValidSymbol_ReturnsUnknownCommand(string input)
     {
         ChatCommandParseResult result = ChatCommandParser.Parse(input);
-        Assert.Equal(ChatInputKind.UnknownCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.UnknownCommand, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 
@@ -54,7 +54,7 @@ public class ChatCommandParserTests
     public void Parse_StockCommandWithInvalidSymbol_ReturnsUnknownCommand(string input)
     {
         ChatCommandParseResult result = ChatCommandParser.Parse(input);
-        Assert.Equal(ChatInputKind.UnknownCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.UnknownCommand, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 
@@ -63,7 +63,7 @@ public class ChatCommandParserTests
     public void Parse_UnknownSlashCommand_ReturnsUnknownCommand()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("/foo");
-        Assert.Equal(ChatInputKind.UnknownCommand, result.Kind);
+        Assert.Equal(ChatInputKindEnum.UnknownCommand, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 
@@ -72,7 +72,7 @@ public class ChatCommandParserTests
     public void Parse_PlainText_ReturnsPlainMessage()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("hello world");
-        Assert.Equal(ChatInputKind.PlainMessage, result.Kind);
+        Assert.Equal(ChatInputKindEnum.PlainMessage, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 
@@ -81,7 +81,7 @@ public class ChatCommandParserTests
     public void Parse_SlashNotFirstChar_ReturnsPlainMessage()
     {
         ChatCommandParseResult result = ChatCommandParser.Parse("see /stock=aapl.us");
-        Assert.Equal(ChatInputKind.PlainMessage, result.Kind);
+        Assert.Equal(ChatInputKindEnum.PlainMessage, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 
@@ -93,7 +93,7 @@ public class ChatCommandParserTests
     public void Parse_NullOrBlank_ReturnsPlainMessage(string? input)
     {
         ChatCommandParseResult result = ChatCommandParser.Parse(input);
-        Assert.Equal(ChatInputKind.PlainMessage, result.Kind);
+        Assert.Equal(ChatInputKindEnum.PlainMessage, result.KindEnum);
         Assert.Null(result.Symbol);
     }
 }

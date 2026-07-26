@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using com.jobsite.chat.Api.Hubs;
-using com.jobsite.chat.Api.Identity;
+using com.jobsite.chat.Api.Features.Chat;
+using com.jobsite.chat.Api.Infrastructure.Identity;
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Enums;
 using com.jobsite.chat.Service.Chat.Commands;
@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 
-namespace com.jobsite.chat.Tests.Api.Hubs;
+namespace com.jobsite.chat.Tests.Api.Features.Chat;
 
 // Spec §2.3 / §4.1: the crown-jewel outcome->client-signal mapping. Hub derives identity from Context.User only.
 public class ChatHubTests
@@ -59,7 +59,7 @@ public class ChatHubTests
         Guid roomId = Guid.NewGuid();
         ChatMessageDto dto = new ChatMessageDto(
             Guid.NewGuid(), roomId, AuthorDisplayName, "hello", false, DateTimeOffset.UtcNow);
-        SendMessageResult result = new SendMessageResult(SendMessageOutcome.MessagePersisted, Message: dto);
+        SendMessageResult result = new SendMessageResult(SendMessageOutcomeEnum.MessagePersisted, Message: dto);
         _mediator.Send(Arg.Any<SendMessageCommand>(), Arg.Any<CancellationToken>()).Returns(result);
         ChatHub hub = CreateHub();
 
@@ -77,7 +77,7 @@ public class ChatHubTests
     public async Task SendMessage_StockCommandQueued_AcksCallerNoBroadcast()
     {
         Guid roomId = Guid.NewGuid();
-        SendMessageResult result = new SendMessageResult(SendMessageOutcome.StockCommandQueued, StockCode: "aapl.us");
+        SendMessageResult result = new SendMessageResult(SendMessageOutcomeEnum.StockCommandQueued, StockCode: "aapl.us");
         _mediator.Send(Arg.Any<SendMessageCommand>(), Arg.Any<CancellationToken>()).Returns(result);
         ChatHub hub = CreateHub();
 
@@ -94,7 +94,7 @@ public class ChatHubTests
     public async Task SendMessage_UnknownCommandRejected_RejectsCallerNoBroadcast()
     {
         Guid roomId = Guid.NewGuid();
-        SendMessageResult result = new SendMessageResult(SendMessageOutcome.UnknownCommandRejected);
+        SendMessageResult result = new SendMessageResult(SendMessageOutcomeEnum.UnknownCommandRejected);
         _mediator.Send(Arg.Any<SendMessageCommand>(), Arg.Any<CancellationToken>()).Returns(result);
         ChatHub hub = CreateHub();
 
@@ -111,7 +111,7 @@ public class ChatHubTests
     public async Task SendMessage_BuildsCommandWithAuthorFromContextUser()
     {
         Guid roomId = Guid.NewGuid();
-        SendMessageResult result = new SendMessageResult(SendMessageOutcome.UnknownCommandRejected);
+        SendMessageResult result = new SendMessageResult(SendMessageOutcomeEnum.UnknownCommandRejected);
         _mediator.Send(Arg.Any<SendMessageCommand>(), Arg.Any<CancellationToken>()).Returns(result);
         ChatHub hub = CreateHub();
 

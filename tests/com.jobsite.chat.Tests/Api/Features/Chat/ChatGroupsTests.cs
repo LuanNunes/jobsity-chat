@@ -1,6 +1,6 @@
-using com.jobsite.chat.Api.Hubs;
+using com.jobsite.chat.Api.Features.Chat;
 
-namespace com.jobsite.chat.Tests.Api.Hubs;
+namespace com.jobsite.chat.Tests.Api.Features.Chat;
 
 // Spec §5.1 / §7: ChatGroups.Room(id) == "room:{id}" and matches the hub's group-name format.
 public class ChatGroupsTests

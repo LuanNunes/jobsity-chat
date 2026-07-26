@@ -1,4 +1,4 @@
-using com.jobsite.chat.Domain.Identity;
+using com.jobsite.chat.Domain.Entities;
 
 namespace com.jobsite.chat.Domain.Dtos;
 

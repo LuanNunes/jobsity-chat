@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using com.jobsite.chat.Api.Identity;
+using com.jobsite.chat.Api.Infrastructure.Identity;
 
-namespace com.jobsite.chat.Tests.Api.Identity;
+namespace com.jobsite.chat.Tests.Api.Infrastructure.Identity;
 
 // Spec §2.4 / §4.1: ToChatAuthor is the ONLY trusted source of sender identity.
 public class ClaimsPrincipalExtensionsTests

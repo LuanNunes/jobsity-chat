@@ -1,12 +1,12 @@
 using System.Reflection;
-using com.jobsite.chat.Api.Hubs;
+using com.jobsite.chat.Api.Features.Chat;
 using com.jobsite.chat.Domain.Exceptions;
-using com.jobsite.chat.Service.Exceptions;
+using com.jobsite.chat.Api.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
-namespace com.jobsite.chat.Tests.Api.Hubs;
+namespace com.jobsite.chat.Tests.Api.Exceptions;
 
 // Spec §2.10 / §4.1: single conversion point. DomainException & RoomNotFoundException -> ErrorOccurred; else rethrow.
 public class HubExceptionFilterTests

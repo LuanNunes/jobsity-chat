@@ -3,16 +3,16 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Domain.Rules;
 
-public sealed record ChatCommandParseResult(ChatInputKind Kind, StockSymbol? Symbol)
+public sealed record ChatCommandParseResult(ChatInputKindEnum KindEnum, StockSymbol? Symbol)
 {
     public static ChatCommandParseResult Plain()
-        => new(ChatInputKind.PlainMessage, null);
+        => new(ChatInputKindEnum.PlainMessage, null);
 
     public static ChatCommandParseResult Stock(StockSymbol symbol)
-        => new(ChatInputKind.StockCommand, symbol);
+        => new(ChatInputKindEnum.StockCommand, symbol);
 
     public static ChatCommandParseResult Unknown()
-        => new(ChatInputKind.UnknownCommand, null);
+        => new(ChatInputKindEnum.UnknownCommand, null);
 }
 
 // Pure, static, deterministic: "what is a command" is a domain rule.

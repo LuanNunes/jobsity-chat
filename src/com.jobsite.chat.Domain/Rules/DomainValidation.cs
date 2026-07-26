@@ -1,8 +1,8 @@
+using com.jobsite.chat.Domain.Exceptions;
 using FluentValidation;
 using FluentValidation.Results;
-using com.jobsite.chat.Domain.Exceptions;
 
-namespace com.jobsite.chat.Domain.Validation;
+namespace com.jobsite.chat.Domain.Rules;
 
 public static class DomainValidation
 {

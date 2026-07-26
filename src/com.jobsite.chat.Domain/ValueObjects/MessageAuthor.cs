@@ -1,5 +1,5 @@
+using com.jobsite.chat.Domain.Rules;
 using FluentValidation;
-using com.jobsite.chat.Domain.Validation;
 
 namespace com.jobsite.chat.Domain.ValueObjects;
 

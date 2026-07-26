@@ -1,7 +1,9 @@
-using com.jobsite.chat.Api.Endpoints;
-using com.jobsite.chat.Api.Hubs;
+using com.jobsite.chat.Api.Features.Auth;
+using com.jobsite.chat.Api.Features.Rooms;
+using com.jobsite.chat.Api.Features.Chat;
 using com.jobsite.chat.Api.Infrastructure;
-using com.jobsite.chat.Domain.Identity;
+using com.jobsite.chat.Domain.Entities;
+using com.jobsite.chat.Api.Exceptions;
 using com.jobsite.chat.Repository;
 using com.jobsite.chat.Repository.Persistence;
 using com.jobsite.chat.Repository.Persistence.Context;

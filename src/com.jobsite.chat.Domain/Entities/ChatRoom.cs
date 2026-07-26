@@ -1,6 +1,6 @@
 using FluentValidation;
 using com.jobsite.chat.Domain.Abstractions;
-using com.jobsite.chat.Domain.Validation;
+using com.jobsite.chat.Domain.Rules;
 
 namespace com.jobsite.chat.Domain.Entities;
 

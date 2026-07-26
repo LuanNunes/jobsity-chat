@@ -1,4 +1,4 @@
-namespace com.jobsite.chat.Service.Exceptions;
+namespace com.jobsite.chat.Domain.Exceptions;
 
 // raised when a command targets a non-existent room.
 public sealed class RoomNotFoundException(Guid roomId)

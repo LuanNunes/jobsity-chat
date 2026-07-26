@@ -1,6 +1,6 @@
 using com.jobsite.chat.Domain.Dtos;
 
-namespace com.jobsite.chat.Api.Hubs;
+namespace com.jobsite.chat.Api.Features.Chat;
 
 // Strongly-typed SignalR client contract (Api presentation type, not a cross-layer port).
 public interface IChatClient

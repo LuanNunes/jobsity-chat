@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace com.jobsite.chat.Api.Identity;
+namespace com.jobsite.chat.Api.Infrastructure.Identity;
 
 // The ONLY trusted source of chat sender identity: derives (userId, displayName) from the cookie principal.
 public static class ClaimsPrincipalExtensions

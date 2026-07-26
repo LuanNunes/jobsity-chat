@@ -1,4 +1,4 @@
-namespace com.jobsite.chat.Api.Identity;
+namespace com.jobsite.chat.Api.Infrastructure.Identity;
 
 // Non-default claim carrying the user's chat display name; persisted at registration.
 public static class AppClaimTypes

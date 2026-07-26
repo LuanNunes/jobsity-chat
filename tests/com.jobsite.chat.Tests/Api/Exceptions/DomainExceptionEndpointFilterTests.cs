@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using com.jobsite.chat.Api.Endpoints;
 using com.jobsite.chat.Domain.Exceptions;
+using com.jobsite.chat.Api.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace com.jobsite.chat.Tests.Api.Endpoints;
+namespace com.jobsite.chat.Tests.Api.Exceptions;
 
 // Unit spec for the rooms-group endpoint filter (spec §2.4): DomainException -> 400 problem+json;
 // any other result or exception passes through untouched.

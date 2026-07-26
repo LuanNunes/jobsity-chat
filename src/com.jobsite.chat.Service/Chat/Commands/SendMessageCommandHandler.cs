@@ -1,9 +1,9 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.Enums;
+using com.jobsite.chat.Domain.Exceptions;
 using com.jobsite.chat.Domain.Rules;
 using com.jobsite.chat.Domain.ValueObjects;
-using com.jobsite.chat.Service.Exceptions;
 using com.jobsite.chat.Shared.Contracts;
 using com.jobsite.chat.Shared.Contracts.Repositories;
 using MediatR;
@@ -15,7 +15,7 @@ public sealed record SendMessageCommand(
     : IRequest<SendMessageResult>;
 
 public sealed record SendMessageResult(
-    SendMessageOutcome Outcome,
+    SendMessageOutcomeEnum OutcomeEnum,
     ChatMessageDto? Message = null,    // set iff MessagePersisted
     string? StockCode = null);         // set iff StockCommandQueued
 
@@ -36,22 +36,22 @@ public sealed class SendMessageCommandHandler(
 
         ChatCommandParseResult parsed = ChatCommandParser.Parse(request.Content);
 
-        Dictionary<ChatInputKind, Func<Task<SendMessageResult>>> handlers = new()
+        Dictionary<ChatInputKindEnum, Func<Task<SendMessageResult>>> handlers = new()
         {
-            [ChatInputKind.StockCommand] = async () =>
+            [ChatInputKindEnum.StockCommand] = async () =>
             {
                 string stockCode = parsed.Symbol!.Value;
                 await stockPublisher.PublishAsync(new StockQuoteRequestDto(request.RoomId, stockCode), cancellationToken);
 
-                return new SendMessageResult(SendMessageOutcome.StockCommandQueued, StockCode: stockCode);
+                return new SendMessageResult(SendMessageOutcomeEnum.StockCommandQueued, StockCode: stockCode);
             },
 
-            [ChatInputKind.UnknownCommand] = () =>
-                Task.FromResult(new SendMessageResult(SendMessageOutcome.UnknownCommandRejected)),
+            [ChatInputKindEnum.UnknownCommand] = () =>
+                Task.FromResult(new SendMessageResult(SendMessageOutcomeEnum.UnknownCommandRejected)),
         };
 
         // Anything not explicitly handled (PlainMessage and any future kind) persists a plain message.
-        return handlers.TryGetValue(parsed.Kind, out Func<Task<SendMessageResult>>? handler)
+        return handlers.TryGetValue(parsed.KindEnum, out Func<Task<SendMessageResult>>? handler)
             ? await handler()
             : await PersistPlainMessageAsync(request, cancellationToken);
     }
@@ -65,6 +65,6 @@ public sealed class SendMessageCommandHandler(
 
         await messages.AddAsync(message, cancellationToken);
 
-        return new SendMessageResult(SendMessageOutcome.MessagePersisted, ChatMessageDto.FromEntity(message));
+        return new SendMessageResult(SendMessageOutcomeEnum.MessagePersisted, ChatMessageDto.FromEntity(message));
     }
 }

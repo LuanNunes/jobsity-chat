@@ -1,9 +1,9 @@
+using com.jobsite.chat.Api.Features.Chat;
 using com.jobsite.chat.Domain.Exceptions;
-using com.jobsite.chat.Service.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace com.jobsite.chat.Api.Hubs;
+namespace com.jobsite.chat.Api.Exceptions;
 
 // Single conversion point: DomainException / RoomNotFoundException -> ephemeral ErrorOccurred; else rethrow.
 public sealed class HubExceptionFilter : IHubFilter

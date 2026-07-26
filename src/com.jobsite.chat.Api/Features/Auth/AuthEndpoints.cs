@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using com.jobsite.chat.Api.Identity;
+using com.jobsite.chat.Api.Infrastructure.Identity;
 using com.jobsite.chat.Domain.Dtos;
-using com.jobsite.chat.Domain.Identity;
+using com.jobsite.chat.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace com.jobsite.chat.Api.Endpoints;
+namespace com.jobsite.chat.Api.Features.Auth;
 
 // JSON auth surface consumed by the SPA (spec §2.3). Hand-rolled (not AddIdentityApiEndpoints) so
 // the DisplayName-as-claim contract and the exact AuthUserDto shape stay under our control.
@@ -27,13 +27,7 @@ public static class AuthEndpoints
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
-        ApplicationUser user = new()
-        {
-            UserName = request.Email,
-            Email = request.Email,
-            DisplayName = request.DisplayName,
-        };
-
+        ApplicationUser user = ApplicationUser.Create(request.Email, request.DisplayName);
         IdentityResult result = await userManager.CreateAsync(user, request.Password);
 
         return result.Succeeded
@@ -51,6 +45,7 @@ public static class AuthEndpoints
     {
         await userManager.AddClaimAsync(user, new Claim(AppClaimTypes.DisplayName, user.DisplayName));
         await signInManager.SignInAsync(user, isPersistent: false);
+        
         return Results.Ok(AuthUserDto.FromEntity(user));
     }
 
@@ -60,7 +55,6 @@ public static class AuthEndpoints
         SignInManager<ApplicationUser> signInManager)
     {
         ApplicationUser? user = await userManager.FindByEmailAsync(request.Email);
-
         SignInResult result = user is null
             ? SignInResult.Failed
             : await user.SignInWithPasswordAsync(signInManager, request.Password, request.RememberMe);
@@ -79,10 +73,10 @@ public static class AuthEndpoints
     private static IResult Me(ClaimsPrincipal principal)
     {
         string id = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        string displayName = principal.FindFirstValue(AppClaimTypes.DisplayName) ?? string.Empty;
         string email = principal.FindFirstValue(ClaimTypes.Email)
             ?? principal.FindFirstValue(ClaimTypes.Name)
             ?? string.Empty;
-        string displayName = principal.FindFirstValue(AppClaimTypes.DisplayName) ?? string.Empty;
 
         return Results.Ok(new AuthUserDto(id, email, displayName));
     }

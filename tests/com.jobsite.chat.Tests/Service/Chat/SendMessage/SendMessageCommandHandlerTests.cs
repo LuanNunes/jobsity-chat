@@ -3,7 +3,6 @@ using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.Enums;
 using com.jobsite.chat.Domain.Exceptions;
 using com.jobsite.chat.Service.Chat.Commands;
-using com.jobsite.chat.Service.Exceptions;
 using com.jobsite.chat.Tests.Service.Fakes;
 using Microsoft.Extensions.Time.Testing;
 
@@ -33,7 +32,7 @@ public class SendMessageCommandHandlerTests
 
         SendMessageResult result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.Equal(SendMessageOutcome.MessagePersisted, result.Outcome);
+        Assert.Equal(SendMessageOutcomeEnum.MessagePersisted, result.OutcomeEnum);
         Assert.Equal(1, _messages.AddAsyncCallCount);
 
         ChatMessage persisted = Assert.Single(_messages.Added);
@@ -87,7 +86,7 @@ public class SendMessageCommandHandlerTests
 
         SendMessageResult result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.Equal(SendMessageOutcome.StockCommandQueued, result.Outcome);
+        Assert.Equal(SendMessageOutcomeEnum.StockCommandQueued, result.OutcomeEnum);
         Assert.Null(result.Message);
         Assert.Equal("aapl.us", result.StockCode);
 
@@ -109,7 +108,7 @@ public class SendMessageCommandHandlerTests
 
         SendMessageResult result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.Equal(SendMessageOutcome.UnknownCommandRejected, result.Outcome);
+        Assert.Equal(SendMessageOutcomeEnum.UnknownCommandRejected, result.OutcomeEnum);
         Assert.Null(result.Message);
         Assert.Null(result.StockCode);
         Assert.Equal(0, _messages.AddAsyncCallCount);

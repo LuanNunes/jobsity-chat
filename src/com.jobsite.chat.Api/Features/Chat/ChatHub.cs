@@ -1,4 +1,4 @@
-using com.jobsite.chat.Api.Identity;
+using com.jobsite.chat.Api.Infrastructure.Identity;
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Enums;
 using com.jobsite.chat.Service.Chat.Commands;
@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace com.jobsite.chat.Api.Hubs;
+namespace com.jobsite.chat.Api.Features.Chat;
 
 [Authorize]
 public sealed class ChatHub(IMediator mediator) : Hub<IChatClient>
@@ -26,13 +26,13 @@ public sealed class ChatHub(IMediator mediator) : Hub<IChatClient>
         (string userId, string displayName) = Context.User!.ToChatAuthor();
         SendMessageResult result = await mediator.Send(new SendMessageCommand(roomId, userId, displayName, content));
 
-        Dictionary<SendMessageOutcome, Func<Task>> handlers = new()
+        Dictionary<SendMessageOutcomeEnum, Func<Task>> handlers = new()
         {
-            [SendMessageOutcome.MessagePersisted] = () => Clients.Group(ChatGroups.Room(roomId)).ReceiveMessage(result.Message!),
-            [SendMessageOutcome.StockCommandQueued] = () => Clients.Caller.CommandAccepted(result.StockCode!),
-            [SendMessageOutcome.UnknownCommandRejected] = () => Clients.Caller.CommandRejected("Unknown command."),
+            [SendMessageOutcomeEnum.MessagePersisted] = () => Clients.Group(ChatGroups.Room(roomId)).ReceiveMessage(result.Message!),
+            [SendMessageOutcomeEnum.StockCommandQueued] = () => Clients.Caller.CommandAccepted(result.StockCode!),
+            [SendMessageOutcomeEnum.UnknownCommandRejected] = () => Clients.Caller.CommandRejected("Unknown command."),
         };
 
-        await handlers[result.Outcome]();
+        await handlers[result.OutcomeEnum]();
     }
 }
