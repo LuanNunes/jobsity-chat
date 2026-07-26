@@ -1,4 +1,5 @@
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 

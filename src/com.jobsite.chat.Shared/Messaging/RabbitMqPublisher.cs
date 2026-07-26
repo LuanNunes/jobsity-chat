@@ -1,5 +1,5 @@
 using System.Text.Json;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts;
 using RabbitMQ.Client;
 
 namespace com.jobsite.chat.Shared.Messaging;

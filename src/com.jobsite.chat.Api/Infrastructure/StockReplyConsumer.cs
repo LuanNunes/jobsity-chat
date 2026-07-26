@@ -1,9 +1,9 @@
 using System.Text.Json;
 using com.jobsite.chat.Api.Hubs;
 using com.jobsite.chat.Domain.Dtos;
-using com.jobsite.chat.Service.Chat.PostBotMessage;
+using com.jobsite.chat.Service.Chat.Commands;
 using com.jobsite.chat.Service.Exceptions;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts;
 using com.jobsite.chat.Shared.Messaging;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;

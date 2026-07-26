@@ -1,4 +1,5 @@
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace com.jobsite.chat.Api.Infrastructure;

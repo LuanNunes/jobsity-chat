@@ -58,14 +58,13 @@ public static class AuthEndpoints
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
-        SignInResult result = await signInManager.PasswordSignInAsync(
-            request.Email, request.Password, request.RememberMe, lockoutOnFailure: false);
+        ApplicationUser? user = await userManager.FindByEmailAsync(request.Email);
 
-        ApplicationUser? user = result.Succeeded
-            ? await userManager.FindByEmailAsync(request.Email)
-            : null;
+        SignInResult result = user is null
+            ? SignInResult.Failed
+            : await user.SignInWithPasswordAsync(signInManager, request.Password, request.RememberMe);
 
-        return user is null
+        return user is null || !result.Succeeded
             ? Results.Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Invalid credentials.")
             : Results.Ok(new AuthUserResponse(user.Id, user.Email!, user.DisplayName));
     }

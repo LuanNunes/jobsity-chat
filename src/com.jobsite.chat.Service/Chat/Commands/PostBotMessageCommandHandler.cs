@@ -1,11 +1,17 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.ValueObjects;
-using com.jobsite.chat.Shared.Abstractions;
 using com.jobsite.chat.Service.Exceptions;
+using com.jobsite.chat.Shared.Contracts.Repositories;
 using MediatR;
 
-namespace com.jobsite.chat.Service.Chat.PostBotMessage;
+namespace com.jobsite.chat.Service.Chat.Commands;
+
+public sealed record PostBotMessageCommand(
+    Guid RoomId,
+    string Content,
+    string BotDisplayName = MessageAuthor.DefaultBotName)
+    : IRequest<ChatMessageDto>;
 
 // Bot replies re-enter as regular persisted messages (req. 4). Content is never
 // command-parsed; the entity trims it. Field validation via the domain factories.
@@ -23,10 +29,11 @@ public sealed class PostBotMessageCommandHandler(
         }
 
         MessageAuthor author = MessageAuthor.Bot(request.BotDisplayName);
-        NewChatMessageDto newChatMessageDto =
-            NewChatMessageDto.Create(request.RoomId, author, request.Content, clock);
+        NewChatMessageDto newChatMessageDto = NewChatMessageDto.Create(request.RoomId, author, request.Content, clock);
         ChatMessage message = ChatMessage.Create(newChatMessageDto);
+        
         await messages.AddAsync(message, cancellationToken);
+        
         return ChatMessageDto.FromEntity(message);
     }
 }

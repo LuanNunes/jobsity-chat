@@ -1,5 +1,5 @@
 using com.jobsite.chat.Service;
-using com.jobsite.chat.Service.Chat.SendMessage;
+using com.jobsite.chat.Service.Chat.Commands;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 

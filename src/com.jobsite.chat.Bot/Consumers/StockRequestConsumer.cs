@@ -2,7 +2,7 @@ using System.Text.Json;
 using com.jobsite.chat.Bot.Stock;
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.ValueObjects;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts;
 using com.jobsite.chat.Shared.Messaging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

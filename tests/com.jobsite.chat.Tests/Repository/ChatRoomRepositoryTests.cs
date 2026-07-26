@@ -1,7 +1,8 @@
 using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 using com.jobsite.chat.Repository.Repositories;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace com.jobsite.chat.Tests.Repository;

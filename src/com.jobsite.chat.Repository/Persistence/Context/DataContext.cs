@@ -4,7 +4,7 @@ using com.jobsite.chat.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace com.jobsite.chat.Repository.Persistence;
+namespace com.jobsite.chat.Repository.Persistence.Context;
 
 // EF-coupled data-access wrapper (spec §3.3). Wraps a concrete DbContext and exposes the
 // generic data-access surface used by the repositories. Lives in Repository, not Shared,

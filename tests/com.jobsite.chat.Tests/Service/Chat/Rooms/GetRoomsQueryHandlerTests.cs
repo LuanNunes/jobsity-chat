@@ -1,6 +1,6 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
-using com.jobsite.chat.Service.Chat.Rooms;
+using com.jobsite.chat.Service.Chat.Queries;
 using com.jobsite.chat.Tests.Service.Fakes;
 
 namespace com.jobsite.chat.Tests.Service.Chat.Rooms;

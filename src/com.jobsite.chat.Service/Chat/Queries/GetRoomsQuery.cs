@@ -1,9 +1,9 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts.Repositories;
 using MediatR;
 
-namespace com.jobsite.chat.Service.Chat.Rooms;
+namespace com.jobsite.chat.Service.Chat.Queries;
 
 public sealed record GetRoomsQuery() : IRequest<IReadOnlyList<ChatRoomDto>>;
 

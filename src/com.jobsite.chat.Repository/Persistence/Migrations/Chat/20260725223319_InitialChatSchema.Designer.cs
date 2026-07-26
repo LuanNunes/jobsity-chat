@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 
 #nullable disable
 

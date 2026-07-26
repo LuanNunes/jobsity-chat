@@ -1,4 +1,4 @@
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts;
 
 namespace com.jobsite.chat.Bot.Stock;
 

@@ -1,9 +1,9 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts.Repositories;
 using MediatR;
 
-namespace com.jobsite.chat.Service.Chat.Rooms;
+namespace com.jobsite.chat.Service.Chat.Commands;
 
 public sealed record CreateRoomCommand(string Name) : IRequest<ChatRoomDto>;
 
@@ -15,6 +15,7 @@ public sealed class CreateRoomCommandHandler(IChatRoomRepository rooms, TimeProv
     {
         ChatRoom room = ChatRoom.Create(request.Name, clock.GetUtcNow());
         await rooms.AddAsync(room, cancellationToken);
+        
         return ChatRoomDto.FromEntity(room);
     }
 }

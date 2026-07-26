@@ -1,7 +1,7 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.Exceptions;
-using com.jobsite.chat.Service.Chat.PostBotMessage;
+using com.jobsite.chat.Service.Chat.Commands;
 using com.jobsite.chat.Service.Exceptions;
 using com.jobsite.chat.Tests.Service.Fakes;
 using Microsoft.Extensions.Time.Testing;

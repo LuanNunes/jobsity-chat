@@ -1,6 +1,6 @@
 using com.jobsite.chat.Bot.Consumers;
 using com.jobsite.chat.Bot.Stock;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts;
 using com.jobsite.chat.Shared.Messaging;
 using Microsoft.Extensions.Options;
 

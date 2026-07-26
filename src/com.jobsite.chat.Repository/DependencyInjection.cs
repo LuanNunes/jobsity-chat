@@ -1,6 +1,8 @@
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 using com.jobsite.chat.Repository.Repositories;
-using com.jobsite.chat.Shared.Abstractions;
+using com.jobsite.chat.Shared.Contracts.Repositories;
+using com.jobsite.chat.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,13 +13,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRepositoryLayer(this IServiceCollection services, IConfiguration configuration)
     {
-        string connectionString = configuration.GetConnectionString("ChatDatabase")
-            ?? throw new InvalidOperationException("Connection string 'ChatDatabase' is not configured.");
+        string connectionString = configuration.GetConnectionString(PersistenceKeys.ChatDatabaseCnnName)
+            ?? throw new InvalidOperationException(
+                $"Connection string '{PersistenceKeys.ChatDatabaseCnnName}' is not configured.");
 
-        services.AddDbContext<ChatDbContext>(options => options.UseSqlite(
-            connectionString, sqlite => sqlite.MigrationsHistoryTable("__EFMigrationsHistory_Chat")));
-        services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlite(
-            connectionString, sqlite => sqlite.MigrationsHistoryTable("__EFMigrationsHistory_Identity")));
+        services.AddDbContext<ChatDbContext>(options =>
+            options.UseChatSqlite(connectionString, PersistenceKeys.ChatMigrationsHistoryTable));
+        services.AddDbContext<AppIdentityDbContext>(options =>
+            options.UseChatSqlite(connectionString, PersistenceKeys.IdentityMigrationsHistoryTable));
 
         services.AddScoped(typeof(IDataContext<>), typeof(DataContext<>));
 

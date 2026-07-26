@@ -4,6 +4,7 @@ using com.jobsite.chat.Api.Infrastructure;
 using com.jobsite.chat.Domain.Identity;
 using com.jobsite.chat.Repository;
 using com.jobsite.chat.Repository.Persistence;
+using com.jobsite.chat.Repository.Persistence.Context;
 using com.jobsite.chat.Service;
 using com.jobsite.chat.Shared.Messaging;
 using Microsoft.AspNetCore.Identity;

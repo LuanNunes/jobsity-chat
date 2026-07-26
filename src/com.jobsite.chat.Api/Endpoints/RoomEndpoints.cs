@@ -1,5 +1,6 @@
 using com.jobsite.chat.Domain.Dtos;
-using com.jobsite.chat.Service.Chat.Rooms;
+using com.jobsite.chat.Service.Chat.Commands;
+using com.jobsite.chat.Service.Chat.Queries;
 using MediatR;
 
 namespace com.jobsite.chat.Api.Endpoints;

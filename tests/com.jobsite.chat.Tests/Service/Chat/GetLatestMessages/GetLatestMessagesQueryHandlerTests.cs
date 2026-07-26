@@ -1,7 +1,7 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Entities;
 using com.jobsite.chat.Domain.ValueObjects;
-using com.jobsite.chat.Service.Chat.GetLatestMessages;
+using com.jobsite.chat.Service.Chat.Queries;
 using com.jobsite.chat.Tests.Service.Fakes;
 
 namespace com.jobsite.chat.Tests.Service.Chat.GetLatestMessages;
