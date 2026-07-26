@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/0 - Shared Folder/">
+    <Project Path="com.jobsite.chat.Shared/com.jobsite.chat.Shared.csproj" />
+  </Folder>
+  <Folder Name="/src/1 - Domain/">
+    <Project Path="com.jobsite.chat.Domain/com.jobsite.chat.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/2 - Repository/">
+    <Project Path="com.jobsite.chat.Repository/com.jobsite.chat.Repository.csproj" />
+  </Folder>
+  <Folder Name="/src/3 - Business/">
+    <Project Path="com.jobsite.chat.Service/com.jobsite.chat.Service.csproj" />
+  </Folder>
+  <Folder Name="/src/Api/">
+    <Project Path="com.jobsite.chat.Api/com.jobsite.chat.Api.csproj" />
+    <Project Path="com.jobsite.chat.Bot/com.jobsite.chat.Bot.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/com.jobsite.chat.Tests/com.jobsite.chat.Tests.csproj" />
+  </Folder>
+</Solution>

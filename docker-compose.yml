@@ -17,8 +17,8 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: src/com.jobsite.chat.Api/Dockerfile
+      context: ./src/api
+      dockerfile: com.jobsite.chat.Api/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -44,8 +44,8 @@ services:
 
   bot:
     build:
-      context: .
-      dockerfile: src/com.jobsite.chat.Bot/Dockerfile
+      context: ./src/api
+      dockerfile: com.jobsite.chat.Bot/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
