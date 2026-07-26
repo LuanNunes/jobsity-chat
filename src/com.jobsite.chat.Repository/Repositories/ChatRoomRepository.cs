@@ -5,26 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace com.jobsite.chat.Repository.Repositories;
 
-public sealed class ChatRoomRepository(ChatDbContext db) : IChatRoomRepository
+public sealed class ChatRoomRepository(IDataContext<ChatDbContext> data) : IChatRoomRepository
 {
+    // Compat ctor: keeps existing `new ChatRoomRepository(context)` call sites compiling.
+    // Delegates to the primary ctor (one code path).
+    public ChatRoomRepository(ChatDbContext db) : this(new DataContext<ChatDbContext>(db)) { }
+
     public Task<bool> ExistsAsync(Guid roomId, CancellationToken ct) =>
         roomId == Guid.Empty
             ? Task.FromResult(false)
-            : db.Rooms.AnyAsync(r => r.Id == roomId, ct);
+            : data.GetEntities<ChatRoom>().AnyAsync(r => r.Id == roomId, ct);
 
     public async Task<IReadOnlyList<ChatRoom>> GetAllAsync(CancellationToken ct)
     {
         IQueryable<ChatRoom> roomsByCreation =
-            from room in db.Rooms.AsNoTracking()
+            from room in data.GetEntities<ChatRoom>().AsNoTracking()
             orderby room.CreatedAtUtc, room.Id
             select room;
 
         return await roomsByCreation.ToListAsync(ct);
     }
 
-    public async Task AddAsync(ChatRoom room, CancellationToken ct)
-    {
-        db.Rooms.Add(room);
-        await db.SaveChangesAsync(ct);
-    }
+    public Task AddAsync(ChatRoom room, CancellationToken ct) =>
+        data.BulkInsert<ChatRoom, Guid>([room], ct);
 }

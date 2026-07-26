@@ -1,4 +1,5 @@
 using FluentValidation;
+using com.jobsite.chat.Domain.Abstractions;
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Validation;
 using com.jobsite.chat.Domain.ValueObjects;
@@ -7,7 +8,7 @@ namespace com.jobsite.chat.Domain.Entities;
 
 // Core chat message entity; private ctor + static factory. EF Core materializes via
 // the private ctor, bypassing the factory guards.
-public sealed class ChatMessage
+public sealed class ChatMessage : IEntityValidator<Guid>
 {
     private const int MaxContentLength = 1000;
 

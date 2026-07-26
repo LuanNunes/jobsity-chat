@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace com.jobsite.chat.Repository.Repositories;
 
-public sealed class ChatMessageRepository(ChatDbContext db) : IChatMessageRepository
+public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IChatMessageRepository
 {
-    public async Task AddAsync(ChatMessage message, CancellationToken ct)
-    {
-        db.Messages.Add(message);
-        await db.SaveChangesAsync(ct);
-    }
+    // Compat ctor: keeps existing `new ChatMessageRepository(context)` call sites compiling.
+    // Delegates to the primary ctor (one code path).
+    public ChatMessageRepository(ChatDbContext db) : this(new DataContext<ChatDbContext>(db)) { }
+
+    public Task AddAsync(ChatMessage message, CancellationToken ct) =>
+        data.BulkInsert<ChatMessage, Guid>([message], ct);
 
     public async Task<IReadOnlyList<ChatMessage>> GetLatestAsync(Guid roomId, int count, CancellationToken ct)
     {
@@ -21,7 +22,7 @@ public sealed class ChatMessageRepository(ChatDbContext db) : IChatMessageReposi
         }
 
         IQueryable<ChatMessage> newestFirstQuery =
-            from message in db.Messages.AsNoTracking()
+            from message in data.GetEntities<ChatMessage>().AsNoTracking()
             where message.RoomId == roomId
             orderby message.SentAtUtc descending, message.Id descending   // => ascending after reverse (ties by Id asc)
             select message;

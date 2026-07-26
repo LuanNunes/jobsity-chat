@@ -1,11 +1,12 @@
 using FluentValidation;
+using com.jobsite.chat.Domain.Abstractions;
 using com.jobsite.chat.Domain.Validation;
 
 namespace com.jobsite.chat.Domain.Entities;
 
 // Core chat room entity; private ctor + static factory. EF Core materializes via
 // the private ctor, bypassing the factory guards.
-public sealed class ChatRoom
+public sealed class ChatRoom : IEntityValidator<Guid>
 {
     private const int MaxNameLength = 100;
 
