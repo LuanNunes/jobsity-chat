@@ -1,12 +1,13 @@
 using System.Security.Claims;
 using com.jobsite.chat.Api.Identity;
+using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace com.jobsite.chat.Api.Endpoints;
 
 // JSON auth surface consumed by the SPA (spec §2.3). Hand-rolled (not AddIdentityApiEndpoints) so
-// the DisplayName-as-claim contract and the exact AuthUserResponse shape stay under our control.
+// the DisplayName-as-claim contract and the exact AuthUserDto shape stay under our control.
 public static class AuthEndpoints
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
@@ -22,7 +23,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> RegisterAsync(
-        RegisterRequest request,
+        RegisterDto request,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
@@ -50,11 +51,11 @@ public static class AuthEndpoints
     {
         await userManager.AddClaimAsync(user, new Claim(AppClaimTypes.DisplayName, user.DisplayName));
         await signInManager.SignInAsync(user, isPersistent: false);
-        return Results.Ok(new AuthUserResponse(user.Id, user.Email!, user.DisplayName));
+        return Results.Ok(AuthUserDto.FromEntity(user));
     }
 
     private static async Task<IResult> LoginAsync(
-        LoginRequest request,
+        LoginDto request,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
@@ -66,7 +67,7 @@ public static class AuthEndpoints
 
         return user is null || !result.Succeeded
             ? Results.Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Invalid credentials.")
-            : Results.Ok(new AuthUserResponse(user.Id, user.Email!, user.DisplayName));
+            : Results.Ok(AuthUserDto.FromEntity(user));
     }
 
     private static async Task<IResult> LogoutAsync(SignInManager<ApplicationUser> signInManager)
@@ -83,6 +84,6 @@ public static class AuthEndpoints
             ?? string.Empty;
         string displayName = principal.FindFirstValue(AppClaimTypes.DisplayName) ?? string.Empty;
 
-        return Results.Ok(new AuthUserResponse(id, email, displayName));
+        return Results.Ok(new AuthUserDto(id, email, displayName));
     }
 }

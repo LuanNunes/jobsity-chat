@@ -31,7 +31,7 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
     private static object NewRegisterBody(string email, string displayName, string password) =>
         new { email, displayName, password };
 
-    // §7.2 #1: register valid -> 200 + Set-Cookie + AuthUserResponse JSON.
+    // §7.2 #1: register valid -> 200 + Set-Cookie + AuthUserDto JSON.
     [Fact]
     public async Task Register_ValidRequest_Returns200WithAuthCookieAndUserJson()
     {

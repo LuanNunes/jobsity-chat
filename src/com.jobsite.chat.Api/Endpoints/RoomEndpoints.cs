@@ -27,9 +27,9 @@ public static class RoomEndpoints
         return Results.Ok(rooms);
     }
 
-    private static async Task<IResult> CreateRoomAsync(CreateRoomRequest request, IMediator mediator)
+    private static async Task<IResult> CreateRoomAsync(CreateRoomCommand command, IMediator mediator)
     {
-        ChatRoomDto room = await mediator.Send(new CreateRoomCommand(request.Name));
+        ChatRoomDto room = await mediator.Send(command);
         return Results.Created($"/api/rooms/{room.Id}", room);
     }
 }
