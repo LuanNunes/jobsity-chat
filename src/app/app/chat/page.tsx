@@ -43,6 +43,10 @@ export default function ChatPage() {
             setMessages((prev) => [...prev, message]);
           }
         },
+        onRoomCreated: (room) =>
+          setRooms((prev) =>
+            prev.some((r) => r.id === room.id) ? prev : [...prev, room]
+          ),
         onCommandAccepted: (stockCode) =>
           setNotice(`Requested a quote for ${stockCode.toUpperCase()}...`),
         onCommandRejected: (reason) => setNotice(reason),
@@ -120,7 +124,9 @@ export default function ChatPage() {
     try {
       const created: Room = await api.createRoom(name);
       setNewRoom("");
-      setRooms((prev) => [...prev, created]);
+      setRooms((prev) =>
+        prev.some((r) => r.id === created.id) ? prev : [...prev, created]
+      );
       await selectRoom(created.id);
     } catch {
       setNotice("Could not create the room (name may be invalid).");

@@ -134,4 +134,75 @@ describe("ChatPage", () => {
     });
     expect(await screen.findByText(/Requested a quote for AAPL.US/)).toBeInTheDocument();
   });
+
+  it("appends a broadcast RoomCreated room to the sidebar", async () => {
+    render(<ChatPage />);
+    // Wait for the initial room list to render before driving the broadcast.
+    await screen.findByRole("button", { name: "General" });
+
+    await act(async () => {
+      hub.handlers.onRoomCreated({ id: "r2", name: "Random" });
+    });
+
+    expect(await screen.findByRole("button", { name: "Random" })).toBeInTheDocument();
+  });
+
+  it("does not duplicate a RoomCreated room whose id already exists", async () => {
+    render(<ChatPage />);
+    await screen.findByRole("button", { name: "General" });
+
+    // The creator already appended this room locally (from the POST response); the Clients.All
+    // broadcast for the same id must be deduped, not re-added.
+    await act(async () => {
+      hub.handlers.onRoomCreated({ id: "r1", name: "General" });
+    });
+
+    expect(screen.getAllByRole("button", { name: "General" })).toHaveLength(1);
+  });
+
+  it("shows exactly one entry when RoomCreated arrives before the create POST resolves", async () => {
+    vi.mocked(api.createRoom).mockResolvedValue({ id: "r2", name: "Random" });
+    render(<ChatPage />);
+    await screen.findByRole("button", { name: "General" });
+
+    // The Clients.All broadcast reaches the creator first...
+    await act(async () => {
+      hub.handlers.onRoomCreated({ id: "r2", name: "Random" });
+    });
+
+    // ...then the creator's own POST resolves and appends the same room.
+    await userEvent.type(
+      screen.getByPlaceholderText("New room name"),
+      "Random"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Create room" }));
+
+    await waitFor(() =>
+      expect(api.createRoom).toHaveBeenCalledWith("Random")
+    );
+    expect(screen.getAllByRole("button", { name: "Random" })).toHaveLength(1);
+  });
+
+  it("shows exactly one entry when the create POST resolves before RoomCreated arrives", async () => {
+    vi.mocked(api.createRoom).mockResolvedValue({ id: "r2", name: "Random" });
+    render(<ChatPage />);
+    await screen.findByRole("button", { name: "General" });
+
+    // The creator's own POST resolves first and appends the room...
+    await userEvent.type(
+      screen.getByPlaceholderText("New room name"),
+      "Random"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Create room" }));
+    await waitFor(() =>
+      expect(api.createRoom).toHaveBeenCalledWith("Random")
+    );
+
+    // ...then the Clients.All broadcast for the same id arrives and must be deduped.
+    await act(async () => {
+      hub.handlers.onRoomCreated({ id: "r2", name: "Random" });
+    });
+
+    expect(screen.getAllByRole("button", { name: "Random" })).toHaveLength(1);
+  });
 });

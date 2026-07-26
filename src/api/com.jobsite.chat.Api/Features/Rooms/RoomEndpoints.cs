@@ -1,8 +1,11 @@
 using com.jobsite.chat.Domain.Dtos;
 using com.jobsite.chat.Api.Exceptions;
+using com.jobsite.chat.Api.Features.Chat;
 using com.jobsite.chat.Service.Chat.Commands;
 using com.jobsite.chat.Service.Chat.Queries;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace com.jobsite.chat.Api.Features.Rooms;
 
@@ -28,9 +31,25 @@ public static class RoomEndpoints
         return Results.Ok(rooms);
     }
 
-    private static async Task<IResult> CreateRoomAsync(CreateRoomCommand command, IMediator mediator)
+    private static async Task<IResult> CreateRoomAsync(
+        CreateRoomCommand command,
+        IMediator mediator,
+        IHubContext<ChatHub, IChatClient> hub,
+        ILoggerFactory loggerFactory)
     {
         ChatRoomDto room = await mediator.Send(command);
+
+        // The room is already persisted; a broadcast failure must not fail the create.
+        try
+        {
+            await hub.Clients.All.RoomCreated(room);
+        }
+        catch (Exception exception)
+        {
+            ILogger logger = loggerFactory.CreateLogger("RoomEndpoints");
+            logger.LogWarning(exception, "Failed to broadcast RoomCreated for room {RoomId}.", room.Id);
+        }
+
         return Results.Created($"/api/rooms/{room.Id}", room);
     }
 }
