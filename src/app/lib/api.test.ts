@@ -66,6 +66,39 @@ describe("api client", () => {
     expect((error as ApiError).message).toBe("Invalid credentials.");
   });
 
+  it("surfaces ASP.NET validation errors over the generic title", async () => {
+    vi.mocked(global.fetch).mockResolvedValue(
+      mockResponse(400, {
+        title: "One or more validation errors occurred.",
+        status: 400,
+        errors: {
+          identity: ["Passwords must have at least one uppercase ('A'-'Z')."],
+        },
+      }),
+    );
+
+    const error: unknown = await api.register("a@b.c", "Ana", "pw").catch((e) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).status).toBe(400);
+    expect((error as ApiError).message).toBe(
+      "Passwords must have at least one uppercase ('A'-'Z').",
+    );
+  });
+
+  it("joins multiple validation messages across fields", async () => {
+    vi.mocked(global.fetch).mockResolvedValue(
+      mockResponse(400, {
+        title: "One or more validation errors occurred.",
+        errors: { identity: ["Too short.", "Needs a digit."] },
+      }),
+    );
+
+    const error: unknown = await api.register("a@b.c", "Ana", "pw").catch((e) => e);
+
+    expect((error as ApiError).message).toBe("Too short. Needs a digit.");
+  });
+
   it("returns undefined for a 204 response (logout)", async () => {
     vi.mocked(global.fetch).mockResolvedValue(mockResponse(204));
     await expect(api.logout()).resolves.toBeUndefined();

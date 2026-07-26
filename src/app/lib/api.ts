@@ -57,11 +57,29 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 async function readError(response: Response): Promise<string> {
   try {
     const body: unknown = await response.json();
-    if (body && typeof body === "object" && "detail" in body) {
-      return String((body as { detail: unknown }).detail);
-    }
-    if (body && typeof body === "object" && "title" in body) {
-      return String((body as { title: unknown }).title);
+    if (body && typeof body === "object") {
+      const problem = body as {
+        errors?: Record<string, string[]>;
+        detail?: unknown;
+        title?: unknown;
+      };
+      
+      // ValidationProblemDetails: surface the per-field messages (e.g. Identity
+      // password rules) instead of the generic "One or more validation errors" title.
+      if (problem.errors && typeof problem.errors === "object") {
+        const messages: string[] = Object.values(problem.errors).flat();
+        if (messages.length > 0) {
+          return messages.join(" ");
+        }
+      }
+      
+      if (problem.detail != null) {
+        return String(problem.detail);
+      }
+      
+      if (problem.title != null) {
+        return String(problem.title);
+      }
     }
     return response.statusText;
   } catch {
