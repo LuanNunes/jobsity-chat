@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { HubConnectionState, type HubConnection } from "@microsoft/signalr";
-import { api, type AuthUser, type ChatMessage, type Room } from "@/lib/api";
+import { ApiError, api, type AuthUser, type ChatMessage, type Room } from "@/lib/api";
 import { buildChatConnection } from "@/lib/chatConnection";
 
 export default function ChatPage() {
@@ -128,8 +128,12 @@ export default function ChatPage() {
         prev.some((r) => r.id === created.id) ? prev : [...prev, created]
       );
       await selectRoom(created.id);
-    } catch {
-      setNotice("Could not create the room (name may be invalid).");
+    } catch (error) {
+      setNotice(
+        error instanceof ApiError
+          ? error.message
+          : "Could not create the room (name may be invalid)."
+      );
     }
   }
 

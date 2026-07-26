@@ -27,6 +27,18 @@ public sealed class ChatRoomRepository(IDataContext<ChatDbContext> data) : IChat
         return await roomsByCreation.ToListAsync(ct);
     }
 
+    public Task<bool> ExistsByNameAsync(string name, CancellationToken ct)
+    {
+        string trimmed = name.Trim();
+
+        IQueryable<ChatRoom> matching =
+            from room in data.GetEntities<ChatRoom>()
+            where EF.Functions.Collate(room.Name, "NOCASE") == trimmed
+            select room;
+
+        return matching.AnyAsync(ct);
+    }
+
     public Task AddAsync(ChatRoom room, CancellationToken ct) =>
         data.Insert<ChatRoom, Guid>(room, ct);
 }

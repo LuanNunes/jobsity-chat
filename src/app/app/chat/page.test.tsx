@@ -54,7 +54,7 @@ vi.mock("@/lib/api", async (importOriginal) => {
 });
 
 import ChatPage from "./page";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 const CID = { id: "u1", email: "cid@test.com", displayName: "Cid" };
 const GENERAL = { id: "r1", name: "General" };
@@ -204,5 +204,28 @@ describe("ChatPage", () => {
     });
 
     expect(screen.getAllByRole("button", { name: "Random" })).toHaveLength(1);
+  });
+
+  it("shows the API error message when createRoom rejects with a duplicate-name error", async () => {
+    vi.mocked(api.createRoom).mockRejectedValue(
+      new ApiError(400, "A room named 'General' already exists.")
+    );
+    render(<ChatPage />);
+    await screen.findByRole("button", { name: "General" });
+
+    await userEvent.type(
+      screen.getByPlaceholderText("New room name"),
+      "general"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Create room" }));
+
+    await waitFor(() => expect(api.createRoom).toHaveBeenCalledWith("general"));
+
+    expect(
+      await screen.findByText("A room named 'General' already exists.")
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Could not create the room/)
+    ).not.toBeInTheDocument();
   });
 });

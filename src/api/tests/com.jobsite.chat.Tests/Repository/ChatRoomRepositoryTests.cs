@@ -140,6 +140,59 @@ public sealed class ChatRoomRepositoryTests
         Assert.Equal(newest.Id, rooms[2].Id);
     }
 
+    // Duplicate-name feature: ExistsByNameAsync is trim + case-insensitive against stored names.
+    [Fact]
+    public async Task ExistsByNameAsync_StoredNameQueriedWithDifferentCaseAndWhitespace_ReturnsTrue()
+    {
+        using SqliteInMemoryFixture fixture = new();
+        ChatRoom room = ChatRoom.Create("General", BaseTime);
+
+        await using (ChatDbContext writeContext = fixture.NewChatContext())
+        {
+            IChatRoomRepository writeRepository = new ChatRoomRepository(writeContext);
+            await writeRepository.AddAsync(room, CancellationToken.None);
+        }
+
+        await using ChatDbContext readContext = fixture.NewChatContext();
+        IChatRoomRepository repository = new ChatRoomRepository(readContext);
+        bool exists = await repository.ExistsByNameAsync("  general  ", CancellationToken.None);
+
+        Assert.True(exists);
+    }
+
+    // ExistsByNameAsync returns false when no room with that name exists.
+    [Fact]
+    public async Task ExistsByNameAsync_NoSuchName_ReturnsFalse()
+    {
+        using SqliteInMemoryFixture fixture = new();
+        ChatRoom room = ChatRoom.Create("General", BaseTime);
+
+        await using (ChatDbContext writeContext = fixture.NewChatContext())
+        {
+            IChatRoomRepository writeRepository = new ChatRoomRepository(writeContext);
+            await writeRepository.AddAsync(room, CancellationToken.None);
+        }
+
+        await using ChatDbContext readContext = fixture.NewChatContext();
+        IChatRoomRepository repository = new ChatRoomRepository(readContext);
+        bool exists = await repository.ExistsByNameAsync("Random", CancellationToken.None);
+
+        Assert.False(exists);
+    }
+
+    // ExistsByNameAsync on an empty database returns false.
+    [Fact]
+    public async Task ExistsByNameAsync_EmptyDatabase_ReturnsFalse()
+    {
+        using SqliteInMemoryFixture fixture = new();
+        await using ChatDbContext context = fixture.NewChatContext();
+        IChatRoomRepository repository = new ChatRoomRepository(context);
+
+        bool exists = await repository.ExistsByNameAsync("General", CancellationToken.None);
+
+        Assert.False(exists);
+    }
+
     // Behavior 8: GetAllAsync leaves the change tracker empty (no-tracking reads).
     [Fact]
     public async Task GetAllAsync_AfterRead_LeavesChangeTrackerEmpty()

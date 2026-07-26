@@ -9,7 +9,10 @@ public interface IChatRoomRepository
     Task<bool> ExistsAsync(Guid roomId, CancellationToken ct);
     
     Task<IReadOnlyList<ChatRoom>> GetAllAsync(CancellationToken ct);
-    
+
+    // True if a room already exists with this name (trimmed, case-insensitive).
+    Task<bool> ExistsByNameAsync(string name, CancellationToken ct);
+
     // Persists immediately (no separate UoW).
     Task AddAsync(ChatRoom room, CancellationToken ct);
 }

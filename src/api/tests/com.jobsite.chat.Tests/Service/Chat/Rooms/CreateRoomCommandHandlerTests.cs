@@ -53,4 +53,62 @@ public class CreateRoomCommandHandlerTests
             () => handler.Handle(new CreateRoomCommand(new string('a', 101)), CancellationToken.None));
         Assert.Equal(0, _rooms.AddAsyncCallCount);
     }
+
+    // Duplicate-name rejection: a room named "General" already exists; creating "general"
+    // (different case) must be rejected with DomainException and must not add a second room.
+    [Fact]
+    public async Task Handle_DuplicateNameDifferentCase_ThrowsDomainExceptionAndDoesNotAdd()
+    {
+        _rooms.SeedExisting(ChatRoom.Create("General", FixedNow));
+        CreateRoomCommandHandler handler = CreateHandler();
+
+        await Assert.ThrowsAsync<DomainException>(
+            () => handler.Handle(new CreateRoomCommand("general"), CancellationToken.None));
+
+        Assert.Equal(0, _rooms.AddAsyncCallCount);
+        Assert.Empty(_rooms.Added);
+    }
+
+    // Duplicate detection is trim-insensitive: input "  General  " collides with stored "General".
+    [Fact]
+    public async Task Handle_DuplicateNameWithSurroundingWhitespace_ThrowsDomainExceptionAndDoesNotAdd()
+    {
+        _rooms.SeedExisting(ChatRoom.Create("General", FixedNow));
+        CreateRoomCommandHandler handler = CreateHandler();
+
+        await Assert.ThrowsAsync<DomainException>(
+            () => handler.Handle(new CreateRoomCommand("  General  "), CancellationToken.None));
+
+        Assert.Equal(0, _rooms.AddAsyncCallCount);
+        Assert.Empty(_rooms.Added);
+    }
+
+    // The rejection message surfaces the incoming trimmed name (case as typed) so the API/UI can show it.
+    [Fact]
+    public async Task Handle_DuplicateName_ThrowsWithNameInMessage()
+    {
+        _rooms.SeedExisting(ChatRoom.Create("General", FixedNow));
+        CreateRoomCommandHandler handler = CreateHandler();
+
+        DomainException exception = await Assert.ThrowsAsync<DomainException>(
+            () => handler.Handle(new CreateRoomCommand("general"), CancellationToken.None));
+
+        // Message echoes the INCOMING trimmed name ("general"), not the stored original casing.
+        Assert.Contains("general", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("already exists", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // A unique name is still created even when other rooms already exist.
+    [Fact]
+    public async Task Handle_UniqueNameWithExistingRooms_AddsRoom()
+    {
+        _rooms.SeedExisting(ChatRoom.Create("General", FixedNow));
+        CreateRoomCommandHandler handler = CreateHandler();
+
+        ChatRoomDto dto = await handler.Handle(new CreateRoomCommand("Random"), CancellationToken.None);
+
+        ChatRoom added = Assert.Single(_rooms.Added);
+        Assert.Equal("Random", added.Name);
+        Assert.Equal("Random", dto.Name);
+    }
 }
