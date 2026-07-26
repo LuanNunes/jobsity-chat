@@ -11,14 +11,11 @@ namespace com.jobsite.chat.Repository.Persistence;
 // because its surface exposes EF types.
 public sealed class DataContext<TContext>(TContext context) : IDataContext<TContext> where TContext : DbContext
 {
-    public IQueryable<T> GetEntities<T>() where T : class =>
-        context.Set<T>();
-
     public IQueryable<T> GetEntities<T>(
         Expression<Func<T, bool>>? predicate = null,
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null) where T : class
     {
-        IQueryable<T> query = context.Set<T>();
+        IQueryable<T> query = context.Set<T>().AsNoTracking();
 
         if (include is not null)
         {
@@ -40,6 +37,14 @@ public sealed class DataContext<TContext>(TContext context) : IDataContext<TCont
     // NEVER string-interpolate user input into `sql`; callers must pass values via `parameters`.
     public IQueryable<T> FromSql<T>(string sql, params object[] parameters) where T : class =>
         context.Set<T>().FromSqlRaw(sql, parameters);
+
+    public async Task Insert<T, TKey>(T entity, CancellationToken ct = default)
+        where T : class, IEntityValidator<TKey> where TKey : notnull
+    {
+        // Add graph-walks owned members (e.g. ChatMessage.Author); persists immediately.
+        context.Set<T>().Add(entity);
+        await context.SaveChangesAsync(ct);
+    }
 
     public async Task BulkInsert<T, TKey>(IReadOnlyCollection<T> entities, CancellationToken ct = default)
         where T : class, IEntityValidator<TKey> where TKey : notnull

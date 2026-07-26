@@ -12,7 +12,7 @@ public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IC
     public ChatMessageRepository(ChatDbContext db) : this(new DataContext<ChatDbContext>(db)) { }
 
     public Task AddAsync(ChatMessage message, CancellationToken ct) =>
-        data.BulkInsert<ChatMessage, Guid>([message], ct);
+        data.Insert<ChatMessage, Guid>(message, ct);
 
     public async Task<IReadOnlyList<ChatMessage>> GetLatestAsync(Guid roomId, int count, CancellationToken ct)
     {
@@ -22,7 +22,7 @@ public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IC
         }
 
         IQueryable<ChatMessage> newestFirstQuery =
-            from message in data.GetEntities<ChatMessage>().AsNoTracking()
+            from message in data.GetEntities<ChatMessage>()
             where message.RoomId == roomId
             orderby message.SentAtUtc descending, message.Id descending   // => ascending after reverse (ties by Id asc)
             select message;

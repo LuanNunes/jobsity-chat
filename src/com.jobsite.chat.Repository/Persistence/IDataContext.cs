@@ -11,8 +11,6 @@ namespace com.jobsite.chat.Repository.Persistence;
 // UpdateSettersBuilder<T>).
 public interface IDataContext<TContext> where TContext : DbContext
 {
-    IQueryable<T> GetEntities<T>() where T : class;
-
     IQueryable<T> GetEntities<T>(
         Expression<Func<T, bool>>? predicate = null,
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null) where T : class;
@@ -21,6 +19,9 @@ public interface IDataContext<TContext> where TContext : DbContext
         where T : class, IEntity<TKey> where TKey : notnull;
 
     IQueryable<T> FromSql<T>(string sql, params object[] parameters) where T : class;
+
+    Task Insert<T, TKey>(T entity, CancellationToken ct = default)
+        where T : class, IEntityValidator<TKey> where TKey : notnull;
 
     Task BulkInsert<T, TKey>(IReadOnlyCollection<T> entities, CancellationToken ct = default)
         where T : class, IEntityValidator<TKey> where TKey : notnull;

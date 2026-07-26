@@ -19,7 +19,7 @@ public sealed class ChatRoomRepository(IDataContext<ChatDbContext> data) : IChat
     public async Task<IReadOnlyList<ChatRoom>> GetAllAsync(CancellationToken ct)
     {
         IQueryable<ChatRoom> roomsByCreation =
-            from room in data.GetEntities<ChatRoom>().AsNoTracking()
+            from room in data.GetEntities<ChatRoom>()
             orderby room.CreatedAtUtc, room.Id
             select room;
 
@@ -27,5 +27,5 @@ public sealed class ChatRoomRepository(IDataContext<ChatDbContext> data) : IChat
     }
 
     public Task AddAsync(ChatRoom room, CancellationToken ct) =>
-        data.BulkInsert<ChatRoom, Guid>([room], ct);
+        data.Insert<ChatRoom, Guid>(room, ct);
 }

@@ -245,6 +245,47 @@ public sealed class DataContextTests
         Assert.False(persisted.Author.IsBot);
     }
 
+    // Insert persists a single entity immediately; a fresh context sees it.
+    [Fact]
+    public async Task Insert_SingleRoom_IsVisibleFromFreshContext()
+    {
+        using SqliteInMemoryFixture fixture = new();
+        ChatRoom room = ChatRoom.Create("Solo", BaseTime);
+
+        await using (ChatDbContext writeContext = fixture.NewChatContext())
+        {
+            IDataContext<ChatDbContext> data = NewData(writeContext);
+            await data.Insert<ChatRoom, Guid>(room, CancellationToken.None);
+        }
+
+        await using ChatDbContext readContext = fixture.NewChatContext();
+        ChatRoom persisted = await readContext.Rooms.AsNoTracking().SingleAsync(r => r.Id == room.Id);
+
+        Assert.Equal("Solo", persisted.Name);
+    }
+
+    // Insert of a ChatMessage persists the owned Author columns (graph handled by Add).
+    [Fact]
+    public async Task Insert_ChatMessage_PersistsOwnedAuthorColumns()
+    {
+        using SqliteInMemoryFixture fixture = new();
+        Guid roomId = Guid.CreateVersion7();
+        ChatMessage message = NewUserMessage(roomId, "single insert", BaseTime, userId: "user-9", displayName: "Ivo");
+
+        await using (ChatDbContext writeContext = fixture.NewChatContext())
+        {
+            IDataContext<ChatDbContext> data = NewData(writeContext);
+            await data.Insert<ChatMessage, Guid>(message, CancellationToken.None);
+        }
+
+        await using ChatDbContext readContext = fixture.NewChatContext();
+        ChatMessage persisted = await readContext.Messages.AsNoTracking().SingleAsync(m => m.Id == message.Id);
+
+        Assert.Equal("user-9", persisted.Author.UserId);
+        Assert.Equal("Ivo", persisted.Author.DisplayName);
+        Assert.False(persisted.Author.IsBot);
+    }
+
     // Behavior 6a: BulkDelete(ids) deletes only the targeted rows immediately (no SaveChanges); the third survives.
     [Fact]
     public async Task BulkDelete_ByIds_DeletesTargetsImmediatelyLeavingOthers()
