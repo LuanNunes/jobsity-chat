@@ -1,5 +1,7 @@
-# Personal Claude Code preferences
+# Personal Claude Code preferences (local only, not shared)
 CLAUDE.local.md
+CLAUDE.md
+.claude/agents/
 
 # .NET
 bin/
