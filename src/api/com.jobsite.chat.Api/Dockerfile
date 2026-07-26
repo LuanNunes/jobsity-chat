@@ -24,6 +24,10 @@ RUN apt-get update \
 
 COPY --from=build /app/publish ./
 
+# The SQLite database lives on the chat-db named volume mounted at /app/data.
+# Pre-create it owned by the non-root app user so a freshly-created volume is writable.
+RUN mkdir -p /app/data && chown $APP_UID /app/data
+
 # Run as the non-root user shipped in the runtime image.
 USER $APP_UID
 
