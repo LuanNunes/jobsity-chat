@@ -18,23 +18,24 @@ public sealed class ChatHub : Hub<IChatClient>
 
     public async Task JoinRoom(Guid roomId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, GroupName(roomId));
+        await Groups.AddToGroupAsync(Context.ConnectionId, ChatGroups.Room(roomId));
         IReadOnlyList<ChatMessageDto> history = await _mediator.Send(new GetLatestMessagesQuery(roomId));
         await Clients.Caller.LoadHistory(history);
     }
 
     public Task LeaveRoom(Guid roomId)
-        => Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(roomId));
+        => Groups.RemoveFromGroupAsync(Context.ConnectionId, ChatGroups.Room(roomId));
 
     public async Task SendMessage(Guid roomId, string content)
     {
         (string userId, string displayName) = Context.User!.ToChatAuthor();
         SendMessageResult result = await _mediator.Send(
             new SendMessageCommand(roomId, userId, displayName, content));
+        
         switch (result.Outcome)
         {
             case SendMessageOutcome.MessagePersisted:
-                await Clients.Group(GroupName(roomId)).ReceiveMessage(result.Message!);
+                await Clients.Group(ChatGroups.Room(roomId)).ReceiveMessage(result.Message!);
                 break;
             case SendMessageOutcome.StockCommandQueued:
                 await Clients.Caller.CommandAccepted(result.StockCode!);
@@ -44,6 +45,4 @@ public sealed class ChatHub : Hub<IChatClient>
                 break;
         }
     }
-
-    private static string GroupName(Guid roomId) => $"room:{roomId}";
 }

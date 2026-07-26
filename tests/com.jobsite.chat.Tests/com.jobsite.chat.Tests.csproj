@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\com.jobsite.chat.Api\com.jobsite.chat.Api.csproj" />
+    <ProjectReference Include="..\..\src\com.jobsite.chat.Bot\com.jobsite.chat.Bot.csproj" Aliases="BotAssembly" />
     <ProjectReference Include="..\..\src\com.jobsite.chat.Domain\com.jobsite.chat.Domain.csproj" />
     <ProjectReference Include="..\..\src\com.jobsite.chat.Service\com.jobsite.chat.Service.csproj" />
     <ProjectReference Include="..\..\src\com.jobsite.chat.Repository\com.jobsite.chat.Repository.csproj" />

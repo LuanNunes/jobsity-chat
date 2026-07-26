@@ -1,7 +1,8 @@
+using com.jobsite.chat.Repository.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace com.jobsite.chat.Repository.Persistence.Design;
+namespace com.jobsite.chat.Repository.Context;
 
 public sealed class AppIdentityDbContextFactory : IDesignTimeDbContextFactory<AppIdentityDbContext>
 {
