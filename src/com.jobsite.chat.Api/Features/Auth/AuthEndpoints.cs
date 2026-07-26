@@ -14,8 +14,10 @@ public static class AuthEndpoints
     {
         RouteGroupBuilder group = app.MapGroup("/api/auth");
 
-        group.MapPost("/register", RegisterAsync).AllowAnonymous();
-        group.MapPost("/login", LoginAsync).AllowAnonymous();
+        // Only the credential-submission endpoints get the strict per-IP limiter; /logout and /me stay
+        // on the global limiter (throttling them would penalise legitimate authenticated sessions).
+        group.MapPost("/register", RegisterAsync).AllowAnonymous().RequireRateLimiting("auth");
+        group.MapPost("/login", LoginAsync).AllowAnonymous().RequireRateLimiting("auth");
         group.MapPost("/logout", LogoutAsync).RequireAuthorization();
         group.MapGet("/me", Me).RequireAuthorization();
 

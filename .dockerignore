@@ -1,0 +1,30 @@
+# Build artifacts
+**/bin
+**/obj
+
+# Version control
+.git
+.gitignore
+
+# Frontend (not part of the .NET images)
+frontend/node_modules
+frontend/.next
+frontend/dist
+frontend/out
+
+# Local SQLite databases and sidecars
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# IDE / editor
+.vs
+.vscode
+.idea
+
+# Misc
+**/*.user
+Dockerfile*
+.dockerignore
+docker-compose*.yml

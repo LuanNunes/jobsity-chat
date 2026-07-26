@@ -7,17 +7,10 @@ namespace com.jobsite.chat.Tests.Api.Integration;
 
 // Integration specs for the CORS policy the SPA depends on (spec §3.1, §7.2 #8/#9). RED today:
 // the Razor host has no "Spa" CORS policy, so the preflight response lacks the CORS headers.
-public sealed class CorsPreflightTests : IClassFixture<ApiWebApplicationFactory>
+public sealed class CorsPreflightTests(ApiWebApplicationFactory factory) : IClassFixture<ApiWebApplicationFactory>
 {
-    private readonly ApiWebApplicationFactory _factory;
-
-    public CorsPreflightTests(ApiWebApplicationFactory factory)
-    {
-        _factory = factory;
-    }
-
     private HttpClient NewClient() =>
-        _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
         });
@@ -29,7 +22,7 @@ public sealed class CorsPreflightTests : IClassFixture<ApiWebApplicationFactory>
     {
         HttpClient client = NewClient();
         HttpRequestMessage request = new(HttpMethod.Options, "/api/rooms");
-        request.Headers.Add("Origin", ApiWebApplicationFactory.SpaOrigin);
+        request.Headers.Add("Origin", factory.SpaOrigin);
         request.Headers.Add("Access-Control-Request-Method", "POST");
 
         HttpResponseMessage response = await client.SendAsync(request);
@@ -39,7 +32,7 @@ public sealed class CorsPreflightTests : IClassFixture<ApiWebApplicationFactory>
             $"Expected 204 or 200 for preflight, got {(int)response.StatusCode}.");
 
         Assert.True(response.Headers.TryGetValues("Access-Control-Allow-Origin", out System.Collections.Generic.IEnumerable<string>? allowedOrigins));
-        Assert.Contains(ApiWebApplicationFactory.SpaOrigin, allowedOrigins!);
+        Assert.Contains(factory.SpaOrigin, allowedOrigins!);
 
         Assert.True(response.Headers.TryGetValues("Access-Control-Allow-Credentials", out System.Collections.Generic.IEnumerable<string>? allowCredentials));
         Assert.Contains("true", allowCredentials!.Select(value => value.ToLowerInvariant()));

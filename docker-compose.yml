@@ -25,12 +25,22 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
+      # Persist SQLite on a named volume mounted at /app/data (see volumes below).
+      ConnectionStrings__ChatDatabase: "Data Source=/app/data/jobsity-chat.db"
       RabbitMq__Host: rabbitmq
       RabbitMq__Port: "5672"
       RabbitMq__UserName: guest
       RabbitMq__Password: guest
     ports:
       - "5080:8080"
+    volumes:
+      - chat-db:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   bot:
     build:
@@ -41,7 +51,18 @@ services:
         condition: service_healthy
     environment:
       DOTNET_ENVIRONMENT: Development
+      # The Bot is a WebApplication exposing only /health; bind it explicitly.
+      ASPNETCORE_URLS: http://+:8080
       RabbitMq__Host: rabbitmq
       RabbitMq__Port: "5672"
       RabbitMq__UserName: guest
       RabbitMq__Password: guest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  chat-db:
