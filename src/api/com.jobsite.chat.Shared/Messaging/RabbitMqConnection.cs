@@ -23,17 +23,32 @@ internal sealed class RabbitMqConnection : IRabbitMqConnection
     {
         RabbitMqOptions value = options.Value;
         _logger = logger;
-        _factory = new ConnectionFactory
+        _factory = BuildFactory(value);
+        _connectPipeline = BuildConnectPipeline();
+    }
+
+    internal static ConnectionFactory BuildFactory(RabbitMqOptions options)
+    {
+        if (string.IsNullOrEmpty(options.Uri))
         {
-            HostName = value.Host,
-            Port = value.Port,
-            UserName = value.UserName,
-            Password = value.Password,
-            VirtualHost = value.VirtualHost,
+            return new ConnectionFactory
+            {
+                HostName = options.Host,
+                Port = options.Port,
+                UserName = options.UserName,
+                Password = options.Password,
+                VirtualHost = options.VirtualHost,
+                AutomaticRecoveryEnabled = true,
+                TopologyRecoveryEnabled = true
+            };
+        }
+
+        return new ConnectionFactory
+        {
+            Uri = new Uri(options.Uri),
             AutomaticRecoveryEnabled = true,
             TopologyRecoveryEnabled = true
         };
-        _connectPipeline = BuildConnectPipeline();
     }
 
     private ResiliencePipeline BuildConnectPipeline() =>
