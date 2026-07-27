@@ -62,6 +62,7 @@ public class Program
                 .ConfigureConsoleSink(builder.Environment.IsDevelopment()),
             preserveStaticLogger: true);
 
+        builder.Services.AddProblemDetails();
         builder.Services.AddServiceLayer();
         builder.Services.AddRepositoryLayer(builder.Configuration);
 
