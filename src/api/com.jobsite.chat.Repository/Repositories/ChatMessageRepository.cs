@@ -8,8 +8,7 @@ namespace com.jobsite.chat.Repository.Repositories;
 
 public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IChatMessageRepository
 {
-    // Compat ctor: keeps existing `new ChatMessageRepository(context)` call sites compiling.
-    // Delegates to the primary ctor (one code path).
+
     public ChatMessageRepository(ChatDbContext db) : this(new DataContext<ChatDbContext>(db)) { }
 
     public Task AddAsync(ChatMessage message, CancellationToken ct) =>
@@ -17,7 +16,7 @@ public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IC
 
     public async Task<IReadOnlyList<ChatMessage>> GetLatestAsync(Guid roomId, int count, CancellationToken ct)
     {
-        if (count <= 0)          // LOAD-BEARING: SQLite treats LIMIT -1 as "no limit"
+        if (count <= 0)
         {
             return [];
         }
@@ -25,12 +24,12 @@ public sealed class ChatMessageRepository(IDataContext<ChatDbContext> data) : IC
         IQueryable<ChatMessage> newestFirstQuery =
             from message in data.GetEntities<ChatMessage>()
             where message.RoomId == roomId
-            orderby message.SentAtUtc descending, message.Id descending   // => ascending after reverse (ties by Id asc)
+            orderby message.SentAtUtc descending, message.Id descending
             select message;
 
         List<ChatMessage> newestFirst = await newestFirstQuery.Take(count).ToListAsync(ct);
 
-        newestFirst.Reverse();                               // oldest->newest of the window
+        newestFirst.Reverse();
         return newestFirst;
     }
 }

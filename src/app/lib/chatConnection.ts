@@ -5,7 +5,6 @@ import {
 } from "@microsoft/signalr";
 import { API_URL, type ChatMessage, type Room } from "./api";
 
-// Server -> client events on IChatClient.
 export interface ChatClientHandlers {
   onReceiveMessage: (message: ChatMessage) => void;
   onLoadHistory: (messages: ChatMessage[]) => void;
@@ -17,7 +16,7 @@ export interface ChatClientHandlers {
 
 export function buildChatConnection(handlers: ChatClientHandlers): HubConnection {
   const connection: HubConnection = new HubConnectionBuilder()
-    // withCredentials sends the auth cookie on negotiate + the socket.
+
     .withUrl(`${API_URL}/hubs/chat`, { withCredentials: true })
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Warning)

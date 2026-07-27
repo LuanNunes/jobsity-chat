@@ -7,7 +7,6 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace com.jobsite.chat.Tests.Service.Chat.PostBotMessage;
 
-// Behaviors 25–28: PostBotMessageCommandHandler.
 public class PostBotMessageCommandHandlerTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 7, 25, 10, 30, 0, TimeSpan.Zero);
@@ -19,7 +18,6 @@ public class PostBotMessageCommandHandlerTests
     private PostBotMessageCommandHandler CreateHandler()
         => new(_rooms, _messages, _clock);
 
-    // Behavior 25
     [Fact]
     public async Task Handle_ValidCommand_PersistsBotMessageAndReturnsDto()
     {
@@ -40,7 +38,6 @@ public class PostBotMessageCommandHandlerTests
         Assert.Equal(roomId, dto.RoomId);
     }
 
-    // Behavior 26
     [Fact]
     public async Task Handle_StockLikeContentFromBot_PersistedVerbatimNotParsed()
     {
@@ -57,7 +54,6 @@ public class PostBotMessageCommandHandlerTests
         Assert.Equal("/stock=aapl.us", dto.Content);
     }
 
-    // Behavior 27
     [Fact]
     public async Task Handle_UnknownRoom_ThrowsRoomNotFoundException()
     {
@@ -72,10 +68,9 @@ public class PostBotMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 28
     [Theory]
-    [InlineData("", "StockBot")]        // empty content
-    [InlineData("   ", "StockBot")]     // whitespace content
+    [InlineData("", "StockBot")]
+    [InlineData("   ", "StockBot")]
     public async Task Handle_EmptyOrWhitespaceContent_ThrowsDomainException(string content, string botName)
     {
         _rooms.ExistsResult = true;
@@ -87,7 +82,6 @@ public class PostBotMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 28
     [Theory]
     [InlineData("")]
     [InlineData("   ")]

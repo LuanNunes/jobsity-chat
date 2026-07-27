@@ -8,12 +8,9 @@ using NSubstitute;
 
 namespace com.jobsite.chat.Tests.Api.Exceptions;
 
-// Spec §2.10 / §4.1: single conversion point. DomainException & RoomNotFoundException -> ErrorOccurred; else rethrow.
 public class HubExceptionFilterTests
 {
-    // A minimal concrete hub whose Clients.Caller is a substituted proxy the filter can SendAsync to.
-    // IHubCallerClients.Caller is typed ISingleClientProxy (: IClientProxy); the substitute must match
-    // that property type or NSubstitute rejects the assignment. SendCoreAsync is inherited from IClientProxy.
+
     private sealed class TestHub : Hub
     {
     }
@@ -39,7 +36,6 @@ public class HubExceptionFilterTests
     private static HubExceptionFilter CreateFilter()
         => new HubExceptionFilter(NullLogger<HubExceptionFilter>.Instance);
 
-    // DomainException -> caller ErrorOccurred(msg), no rethrow.
     [Fact]
     public async Task InvokeMethodAsync_DomainException_SendsErrorOccurredToCallerNoRethrow()
     {
@@ -57,7 +53,6 @@ public class HubExceptionFilterTests
             Arg.Any<CancellationToken>());
     }
 
-    // RoomNotFoundException -> ErrorOccurred, no rethrow.
     [Fact]
     public async Task InvokeMethodAsync_RoomNotFoundException_SendsErrorOccurredToCallerNoRethrow()
     {
@@ -76,7 +71,6 @@ public class HubExceptionFilterTests
             Arg.Any<CancellationToken>());
     }
 
-    // unrelated exception -> rethrown; no ErrorOccurred to caller.
     [Fact]
     public async Task InvokeMethodAsync_UnrelatedException_RethrowsAndDoesNotSendError()
     {
@@ -92,7 +86,6 @@ public class HubExceptionFilterTests
             Arg.Any<string>(), Arg.Any<object?[]>(), Arg.Any<CancellationToken>());
     }
 
-    // happy path: no exception -> returns the inner result unchanged, no ErrorOccurred.
     [Fact]
     public async Task InvokeMethodAsync_NoException_ReturnsInnerResult()
     {

@@ -4,8 +4,6 @@ using com.jobsite.chat.Domain.Rules;
 
 namespace com.jobsite.chat.Domain.Entities;
 
-// Core chat room entity; private ctor + static factory. EF Core materializes via
-// the private ctor, bypassing the factory guards.
 public sealed class ChatRoom : IEntityValidator<Guid>
 {
     private const int MaxNameLength = 100;
@@ -18,7 +16,7 @@ public sealed class ChatRoom : IEntityValidator<Guid>
     }
 
     public Guid Id { get; }
-    public string Name { get; }           // trimmed
+    public string Name { get; }
     public DateTimeOffset CreatedAtUtc { get; }
 
     private static readonly InlineValidator<ChatRoom> Rules = new()

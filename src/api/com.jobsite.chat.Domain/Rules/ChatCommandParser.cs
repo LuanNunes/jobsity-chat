@@ -15,7 +15,6 @@ public sealed record ChatCommandParseResult(ChatInputKindEnum KindEnum, StockSym
         => new(ChatInputKindEnum.UnknownCommand, null);
 }
 
-// Pure, static, deterministic: "what is a command" is a domain rule.
 public static class ChatCommandParser
 {
     private const string StockPrefix = "/stock=";
@@ -32,9 +31,9 @@ public static class ChatCommandParser
         {
             return ChatCommandParseResult.Unknown();
         }
-            
+
         string raw = trimmed[StockPrefix.Length..];
-        return StockSymbol.TryCreate(raw, out StockSymbol? symbol) 
+        return StockSymbol.TryCreate(raw, out StockSymbol? symbol)
             ? ChatCommandParseResult.Stock(symbol!)
             : ChatCommandParseResult.Unknown();
     }

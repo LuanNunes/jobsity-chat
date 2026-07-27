@@ -8,7 +8,6 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace com.jobsite.chat.Tests.Service.Chat.SendMessage;
 
-// Behaviors 19–24: SendMessageCommandHandler.
 public class SendMessageCommandHandlerTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 7, 25, 10, 30, 0, TimeSpan.Zero);
@@ -21,7 +20,6 @@ public class SendMessageCommandHandlerTests
     private SendMessageCommandHandler CreateHandler()
         => new(_rooms, _messages, _publisher, _clock);
 
-    // Behavior 19
     [Fact]
     public async Task Handle_PlainContent_PersistsMessageAndReturnsPopulatedDto()
     {
@@ -48,7 +46,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal("hello world", result.Message.Content);
     }
 
-    // Behavior 19
     [Fact]
     public async Task Handle_PlainContent_NeverCallsPublisher()
     {
@@ -61,7 +58,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _publisher.PublishCallCount);
     }
 
-    // Behavior 20
     [Fact]
     public async Task Handle_PlainContent_PersistedSentAtUtcEqualsClock()
     {
@@ -75,7 +71,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(FixedNow, result.Message!.SentAtUtc);
     }
 
-    // Behavior 21
     [Fact]
     public async Task Handle_StockCommand_PublishesRequestAndDoesNotPersist()
     {
@@ -98,7 +93,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 22
     [Fact]
     public async Task Handle_UnknownCommand_PersistsNothingPublishesNothing()
     {
@@ -115,7 +109,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _publisher.PublishCallCount);
     }
 
-    // Behavior 23
     [Fact]
     public async Task Handle_RoomDoesNotExist_PlainContent_ThrowsRoomNotFoundException()
     {
@@ -131,7 +124,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _publisher.PublishCallCount);
     }
 
-    // Behavior 23
     [Fact]
     public async Task Handle_RoomDoesNotExist_StockCommand_ThrowsBeforeParse()
     {
@@ -147,11 +139,10 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 23
     [Fact]
     public async Task Handle_EmptyRoomId_TreatedAsUnknownRoom_ThrowsRoomNotFoundException()
     {
-        _rooms.ExistsResult = false; // contract: ExistsAsync(Guid.Empty) is false
+        _rooms.ExistsResult = false;
         SendMessageCommandHandler handler = CreateHandler();
         SendMessageCommand command = new SendMessageCommand(Guid.Empty, "user-1", "Ana", "hello");
 
@@ -160,11 +151,10 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(Guid.Empty, ex.RoomId);
     }
 
-    // Behavior 24
     [Theory]
-    [InlineData("", "Ana", "hello")]        // empty AuthorUserId
-    [InlineData("user-1", "Ana", "")]        // empty Content
-    [InlineData("user-1", "Ana", "   ")]     // whitespace Content
+    [InlineData("", "Ana", "hello")]
+    [InlineData("user-1", "Ana", "")]
+    [InlineData("user-1", "Ana", "   ")]
     public async Task Handle_InvalidFieldsWithExistingRoom_ThrowsDomainException(
         string authorUserId, string displayName, string content)
     {
@@ -177,7 +167,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 24
     [Fact]
     public async Task Handle_Content1001Chars_ThrowsDomainException()
     {
@@ -190,7 +179,6 @@ public class SendMessageCommandHandlerTests
         Assert.Equal(0, _messages.AddAsyncCallCount);
     }
 
-    // Behavior 24
     [Fact]
     public async Task Handle_DisplayName101Chars_ThrowsDomainException()
     {

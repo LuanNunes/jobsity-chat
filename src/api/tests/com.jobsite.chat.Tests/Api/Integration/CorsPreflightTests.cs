@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace com.jobsite.chat.Tests.Api.Integration;
 
-// Integration specs for the CORS policy the SPA depends on (spec §3.1, §7.2 #8/#9). RED today:
-// the Razor host has no "Spa" CORS policy, so the preflight response lacks the CORS headers.
 public sealed class CorsPreflightTests(ApiWebApplicationFactory factory) : IClassFixture<ApiWebApplicationFactory>
 {
     private HttpClient NewClient() =>
@@ -15,8 +13,6 @@ public sealed class CorsPreflightTests(ApiWebApplicationFactory factory) : IClas
             AllowAutoRedirect = false,
         });
 
-    // §7.2 #8: preflight OPTIONS /api/rooms with the SPA origin + POST method ->
-    // 2xx/204 echoing Access-Control-Allow-Origin: http://localhost:3000 and Allow-Credentials: true.
     [Fact]
     public async Task Preflight_FromSpaOrigin_AllowsOriginAndCredentials()
     {
@@ -38,7 +34,6 @@ public sealed class CorsPreflightTests(ApiWebApplicationFactory factory) : IClas
         Assert.Contains("true", allowCredentials!.Select(value => value.ToLowerInvariant()));
     }
 
-    // §7.2 #9 (negative): a foreign origin is NOT echoed in Access-Control-Allow-Origin.
     [Fact]
     public async Task Preflight_FromForeignOrigin_DoesNotEchoAllowOrigin()
     {

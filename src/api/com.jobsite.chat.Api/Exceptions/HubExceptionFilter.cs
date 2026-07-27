@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace com.jobsite.chat.Api.Exceptions;
 
-// Single conversion point: DomainException / RoomNotFoundException -> ephemeral ErrorOccurred; else rethrow.
 public sealed class HubExceptionFilter : IHubFilter
 {
     private readonly ILogger<HubExceptionFilter> _logger;

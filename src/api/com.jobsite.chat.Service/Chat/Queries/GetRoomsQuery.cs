@@ -7,7 +7,6 @@ namespace com.jobsite.chat.Service.Chat.Queries;
 
 public sealed record GetRoomsQuery() : IRequest<IReadOnlyList<ChatRoomDto>>;
 
-// Map all rooms from GetAllAsync to DTOs.
 public sealed class GetRoomsQueryHandler(IChatRoomRepository rooms)
     : IRequestHandler<GetRoomsQuery, IReadOnlyList<ChatRoomDto>>
 {

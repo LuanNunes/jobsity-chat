@@ -3,10 +3,9 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Tests.Domain.ValueObjects;
 
-// Behaviors 16–17: MessageAuthor.User / MessageAuthor.Bot.
 public class MessageAuthorTests
 {
-    // Behavior 16
+
     [Fact]
     public void User_ValidInput_IsBotFalseAndFieldsSet()
     {
@@ -16,7 +15,6 @@ public class MessageAuthorTests
         Assert.Equal("Ana", author.DisplayName);
     }
 
-    // Behavior 16
     [Fact]
     public void User_TrimsDisplayName()
     {
@@ -24,7 +22,6 @@ public class MessageAuthorTests
         Assert.Equal("Ana", author.DisplayName);
     }
 
-    // Behavior 16
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -34,7 +31,6 @@ public class MessageAuthorTests
         Assert.Throws<DomainException>(() => MessageAuthor.User(userId!, "Ana"));
     }
 
-    // Behavior 16
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -44,14 +40,12 @@ public class MessageAuthorTests
         Assert.Throws<DomainException>(() => MessageAuthor.User("id", displayName!));
     }
 
-    // Behavior 16
     [Fact]
     public void User_DisplayNameLongerThan100_ThrowsDomainException()
     {
         Assert.Throws<DomainException>(() => MessageAuthor.User("id", new string('a', 101)));
     }
 
-    // Behavior 16
     [Fact]
     public void User_DisplayNameExactly100_Succeeds()
     {
@@ -60,7 +54,6 @@ public class MessageAuthorTests
         Assert.Equal(name, author.DisplayName);
     }
 
-    // Behavior 17
     [Fact]
     public void Bot_Default_HasNullUserIdAndDefaultName()
     {
@@ -70,7 +63,6 @@ public class MessageAuthorTests
         Assert.Equal("StockBot", author.DisplayName);
     }
 
-    // Behavior 17
     [Fact]
     public void Bot_GivenName_UsesGivenName()
     {
@@ -79,7 +71,6 @@ public class MessageAuthorTests
         Assert.Equal("Quoter", author.DisplayName);
     }
 
-    // Behavior 17
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
@@ -88,14 +79,12 @@ public class MessageAuthorTests
         Assert.Throws<DomainException>(() => MessageAuthor.Bot(name));
     }
 
-    // Behavior 17
     [Fact]
     public void Bot_NameLongerThan100_ThrowsDomainException()
     {
         Assert.Throws<DomainException>(() => MessageAuthor.Bot(new string('a', 101)));
     }
 
-    // rev. 3 spec §4.2 — two-field aggregation: both invalid fields reported in one message.
     [Fact]
     public void User_UserIdAndDisplayNameEmpty_ThrowsSingleDomainExceptionListingBothViolations()
     {
@@ -105,7 +94,6 @@ public class MessageAuthorTests
         Assert.Contains("'Display Name'", exception.Message);
     }
 
-    // rev. 3 spec §4.3 — null userId must throw, never silently coalesce into a valid bot.
     [Fact]
     public void User_NullUserId_ThrowsDomainExceptionAndDoesNotBecomeBot()
     {

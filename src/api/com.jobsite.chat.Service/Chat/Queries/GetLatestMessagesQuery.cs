@@ -7,12 +7,10 @@ namespace com.jobsite.chat.Service.Chat.Queries;
 
 public sealed record GetLatestMessagesQuery(Guid RoomId) : IRequest<IReadOnlyList<ChatMessageDto>>;
 
-// Calls messages.GetLatestAsync(RoomId, MessageLimit, ct); maps to DTOs preserving order.
-// Unknown room (including Guid.Empty) => empty list (no throw on the read path).
 public sealed class GetLatestMessagesQueryHandler(IChatMessageRepository messages)
     : IRequestHandler<GetLatestMessagesQuery, IReadOnlyList<ChatMessageDto>>
 {
-    public const int MessageLimit = 50;   // handler owns the limit; not caller-supplied
+    public const int MessageLimit = 50;
 
     public async Task<IReadOnlyList<ChatMessageDto>> Handle(GetLatestMessagesQuery request, CancellationToken cancellationToken)
     {

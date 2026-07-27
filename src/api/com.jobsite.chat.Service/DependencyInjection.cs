@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace com.jobsite.chat.Service;
 
-// Registers MediatR handlers from this assembly plus the system clock. No pipeline behaviors.
 public static class DependencyInjection
 {
     public static IServiceCollection AddServiceLayer(this IServiceCollection services)

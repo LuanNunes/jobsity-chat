@@ -7,8 +7,6 @@ using RabbitMQ.Client;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Singleton. Opens ONE IConnection on first use, guarded by a semaphore (double-checked),
-// with a Polly exponential-backoff retry so a broker that is not yet up does not crash startup.
 internal sealed class RabbitMqConnection : IRabbitMqConnection
 {
     private const int MaxAttempts = 10;
@@ -38,8 +36,6 @@ internal sealed class RabbitMqConnection : IRabbitMqConnection
         _connectPipeline = BuildConnectPipeline();
     }
 
-    // Retry the connect (MaxAttempts total = 1 initial + MaxAttempts-1 retries) with exponential
-    // backoff + jitter; never retry on cancellation. Mirrors the HttpClient resilience used by the Bot.
     private ResiliencePipeline BuildConnectPipeline() =>
         new ResiliencePipelineBuilder()
             .AddRetry(new RetryStrategyOptions

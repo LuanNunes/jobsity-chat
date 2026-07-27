@@ -5,12 +5,10 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Tests.Domain.Entities;
 
-// Behaviors 14–15: ChatMessage.Create.
 public class ChatMessageTests
 {
     private static readonly DateTimeOffset SentAt = new(2026, 7, 25, 12, 0, 0, TimeSpan.Zero);
 
-    // Behavior 14
     [Fact]
     public void Create_ValidInput_SetsAllFieldsAndTrimsContent()
     {
@@ -25,7 +23,6 @@ public class ChatMessageTests
         Assert.Equal(SentAt, message.SentAtUtc);
     }
 
-    // Behavior 14
     [Fact]
     public void Create_ValidInput_GeneratesNonEmptyId()
     {
@@ -33,7 +30,6 @@ public class ChatMessageTests
         Assert.NotEqual(Guid.Empty, message.Id);
     }
 
-    // Behavior 14
     [Fact]
     public void Create_TwoMessages_GeneratesUniqueIds()
     {
@@ -42,7 +38,6 @@ public class ChatMessageTests
         Assert.NotEqual(a.Id, b.Id);
     }
 
-    // Behavior 15
     [Fact]
     public void Create_EmptyRoomId_ThrowsDomainException()
     {
@@ -50,7 +45,6 @@ public class ChatMessageTests
             ChatMessage.Create(new NewChatMessageDto(Guid.Empty, MessageAuthor.User("u", "Ana"), "hi", SentAt)));
     }
 
-    // Behavior 15
     [Fact]
     public void Create_NullAuthor_ThrowsDomainException()
     {
@@ -58,7 +52,6 @@ public class ChatMessageTests
             ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), null!, "hi", SentAt)));
     }
 
-    // Behavior 15
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -69,7 +62,6 @@ public class ChatMessageTests
             ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content!, SentAt)));
     }
 
-    // Behavior 15
     [Fact]
     public void Create_ContentLongerThan1000AfterTrim_ThrowsDomainException()
     {
@@ -78,7 +70,6 @@ public class ChatMessageTests
             ChatMessage.Create(new NewChatMessageDto(Guid.NewGuid(), MessageAuthor.User("u", "Ana"), content, SentAt)));
     }
 
-    // Behavior 15
     [Fact]
     public void Create_ContentExactly1000_Succeeds()
     {
@@ -87,7 +78,6 @@ public class ChatMessageTests
         Assert.Equal(content, message.Content);
     }
 
-    // rev. 3 spec §4.1 — aggregation: all invalid fields reported in one message.
     [Fact]
     public void Create_AllFieldsInvalid_ThrowsSingleDomainExceptionListingEveryViolation()
     {
@@ -99,7 +89,6 @@ public class ChatMessageTests
         Assert.Contains("'Content'", exception.Message);
     }
 
-    // rev. 3 spec §4.5 — trim precedes validation: padded 1000-char content passes and stores trimmed.
     [Fact]
     public void Create_PaddedContentExactly1000AfterTrim_SucceedsWithLength1000()
     {
@@ -109,7 +98,6 @@ public class ChatMessageTests
         Assert.Equal(1000, message.Content.Length);
     }
 
-    // rev. 3.1 spec §4.6 — NewChatMessage supports `with` derivation used by future call sites.
     [Fact]
     public void Create_DraftDerivedWithExpression_SucceedsWithOverriddenContent()
     {

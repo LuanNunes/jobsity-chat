@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace com.jobsite.chat.Repository.Persistence.Context;
 
-// EF-coupled data-access wrapper (spec §3.2). Deliberately lives in Repository, not Shared:
-// its surface exposes EF types (DbContext, EntityState, IIncludableQueryable, DbCommand,
-// UpdateSettersBuilder<T>).
 public interface IDataContext<TContext> where TContext : DbContext
 {
     IQueryable<T> GetEntities<T>(

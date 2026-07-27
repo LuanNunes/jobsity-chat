@@ -1,6 +1,5 @@
 namespace com.jobsite.chat.Shared.Infrastructure;
 
-// Reads the design-time (dotnet ef) connection string from the environment; shared by both factories.
 public static class JobsityChatCnnString
 {
     public static string FromEnvironment() =>

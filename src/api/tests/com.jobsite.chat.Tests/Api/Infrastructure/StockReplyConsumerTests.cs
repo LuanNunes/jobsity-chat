@@ -10,13 +10,9 @@ using NSubstitute;
 
 namespace com.jobsite.chat.Tests.Api.Infrastructure;
 
-// Spec §5.2 / §7: reply->PostBotMessageCommand+broadcast mapping, exercised through the internal
-// per-message handler seam (no real RabbitMQ channel). Given a StockQuoteReply body, the handler
-// dispatches PostBotMessageCommand(RoomId, BotText) via IMediator and broadcasts the returned
-// ChatMessageDto via IHubContext<ChatHub,IChatClient> to Clients.Group("room:{roomId}").ReceiveMessage(dto).
 public class StockReplyConsumerTests
 {
-    // JSON options mirror the spec's transport contract (Web defaults, case-insensitive).
+
     private static readonly JsonSerializerOptions JsonOpts =
         new(JsonSerializerDefaults.Web) { PropertyNameCaseInsensitive = true };
 
@@ -34,7 +30,6 @@ public class StockReplyConsumerTests
     private static byte[] Serialize(StockQuoteReply reply)
         => JsonSerializer.SerializeToUtf8Bytes(reply, JsonOpts);
 
-    // Handler dispatches PostBotMessageCommand(reply.RoomId, reply.BotText).
     [Fact]
     public async Task HandleReplyAsync_ReplyBody_DispatchesPostBotMessageCommandWithRoomAndText()
     {
@@ -56,7 +51,6 @@ public class StockReplyConsumerTests
             Arg.Any<CancellationToken>());
     }
 
-    // Handler broadcasts the returned dto to Clients.Group("room:{roomId}").ReceiveMessage(dto).
     [Fact]
     public async Task HandleReplyAsync_ReplyBody_BroadcastsReturnedDtoToRoomGroup()
     {
@@ -74,7 +68,6 @@ public class StockReplyConsumerTests
         await _groupClient.Received(1).ReceiveMessage(dto);
     }
 
-    // Invalid-symbol reply (Success=false) is still persisted+broadcast verbatim (Api posts BotText either way).
     [Fact]
     public async Task HandleReplyAsync_UnsuccessfulReply_StillPostsAndBroadcastsBotText()
     {

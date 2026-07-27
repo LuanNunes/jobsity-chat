@@ -24,8 +24,6 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IDataContext<>), typeof(DataContext<>));
 
-        // Explicit factories pin the primary IDataContext ctor; both repos have two 1-arg
-        // ctors, so open-generic registration would otherwise trip MS.DI's ambiguous-ctor rule.
         services.AddScoped<IChatRoomRepository>(sp =>
             new ChatRoomRepository(sp.GetRequiredService<IDataContext<ChatDbContext>>()));
         services.AddScoped<IChatMessageRepository>(sp =>

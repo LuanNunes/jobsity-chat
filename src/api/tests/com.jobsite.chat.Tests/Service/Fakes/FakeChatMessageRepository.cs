@@ -3,7 +3,6 @@ using com.jobsite.chat.Shared.Contracts.Repositories;
 
 namespace com.jobsite.chat.Tests.Service.Fakes;
 
-// Hand-rolled fake recording calls; GetLatestAsync result and captured args are inspectable.
 public sealed class FakeChatMessageRepository : IChatMessageRepository
 {
     public List<ChatMessage> Added { get; } = new();

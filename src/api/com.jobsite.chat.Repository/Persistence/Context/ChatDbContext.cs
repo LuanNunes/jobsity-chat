@@ -7,11 +7,9 @@ namespace com.jobsite.chat.Repository.Persistence.Context;
 
 public sealed class ChatDbContext : DbContext
 {
-    // Runtime: DI supplies the options (connection string + history table via AddRepositoryLayer).
+
     public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options) { }
 
-    // Design-time (dotnet ef): EF instantiates via this parameterless ctor and OnConfiguring
-    // self-configures from the environment — no design-time factory, no Api host boot.
     public ChatDbContext() { }
 
     public DbSet<ChatRoom> Rooms => Set<ChatRoom>();

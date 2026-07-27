@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace com.jobsite.chat.Tests.Repository;
 
-// Spec §4 behavior 21: model/schema assertions on ChatDbContext (exercises the config directly,
-// not repository logic — expected to PASS from the compile-enablement skeletons).
 public sealed class ChatDbContextTests
 {
-    // Behavior 21: ChatDbContext model declares a non-unique index on (RoomId, SentAtUtc).
+
     [Fact]
     public void Model_ChatMessage_DeclaresNonUniqueIndexOnRoomIdAndSentAtUtc()
     {

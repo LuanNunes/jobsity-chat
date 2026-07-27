@@ -7,8 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-// Public so the host type stays discoverable and consistent with the Api. The Bot is a WebApplication
-// only to expose a tiny /health endpoint for orchestration; its real work is the RabbitMQ consumer.
 public class Program
 {
     public static async Task<int> Main(string[] args)
@@ -35,7 +33,6 @@ public class Program
         }
     }
 
-    // Let the host-abort / factory stop signal propagate rather than logging it as a fatal crash.
     private static bool IsHostStopSignal(Exception exception) =>
         exception is HostAbortedException || exception.GetType().Name == "StopTheHostException";
 

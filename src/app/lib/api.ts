@@ -1,5 +1,3 @@
-// Thin fetch wrapper around the ASP.NET Core API. Every call sends the auth
-// cookie (credentials: "include"); the API's CORS "Spa" policy allows it.
 
 export const API_URL: string =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5202";
@@ -15,7 +13,6 @@ export interface Room {
   name: string;
 }
 
-// Matches the API's ChatMessageDto (camelCase JSON).
 export interface ChatMessage {
   id: string;
   roomId: string;
@@ -63,20 +60,18 @@ async function readError(response: Response): Promise<string> {
         detail?: unknown;
         title?: unknown;
       };
-      
-      // ValidationProblemDetails: surface the per-field messages (e.g. Identity
-      // password rules) instead of the generic "One or more validation errors" title.
+
       if (problem.errors && typeof problem.errors === "object") {
         const messages: string[] = Object.values(problem.errors).flat();
         if (messages.length > 0) {
           return messages.join(" ");
         }
       }
-      
+
       if (problem.detail != null) {
         return String(problem.detail);
       }
-      
+
       if (problem.title != null) {
         return String(problem.title);
       }

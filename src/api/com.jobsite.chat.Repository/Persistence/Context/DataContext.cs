@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace com.jobsite.chat.Repository.Persistence.Context;
 
-// EF-coupled data-access wrapper (spec §3.3). Wraps a concrete DbContext and exposes the
-// generic data-access surface used by the repositories. Lives in Repository, not Shared,
-// because its surface exposes EF types.
 public sealed class DataContext<TContext>(TContext context) : IDataContext<TContext> where TContext : DbContext
 {
     public IQueryable<T> GetEntities<T>(
@@ -34,14 +31,13 @@ public sealed class DataContext<TContext>(TContext context) : IDataContext<TCont
         where T : class, IEntity<TKey> where TKey : notnull =>
         context.Set<T>().FindAsync([id], ct).AsTask();
 
-    // NEVER string-interpolate user input into `sql`; callers must pass values via `parameters`.
     public IQueryable<T> FromSql<T>(string sql, params object[] parameters) where T : class =>
         context.Set<T>().FromSqlRaw(sql, parameters);
 
     public async Task Insert<T, TKey>(T entity, CancellationToken ct = default)
         where T : class, IEntityValidator<TKey> where TKey : notnull
     {
-        // Add graph-walks owned members (e.g. ChatMessage.Author); persists immediately.
+
         context.Set<T>().Add(entity);
         await context.SaveChangesAsync(ct);
     }
@@ -54,7 +50,6 @@ public sealed class DataContext<TContext>(TContext context) : IDataContext<TCont
             return;
         }
 
-        // AddRange graph-walks owned members (e.g. ChatMessage.Author); persists immediately.
         context.Set<T>().AddRange(entities);
         await context.SaveChangesAsync(ct);
     }
@@ -67,9 +62,6 @@ public sealed class DataContext<TContext>(TContext context) : IDataContext<TCont
             return;
         }
 
-        // Build `e => ids.Contains(e.Id)` MANUALLY so EF binds the CONCRETE Id property
-        // rather than the interface member (which isn't guaranteed EF-translatable under
-        // the generic constraint). Spec §3.3 / Decision §6.10.
         ParameterExpression parameter = Expression.Parameter(typeof(T), "e");
         MemberExpression idProperty = Expression.Property(parameter, nameof(IEntity<TKey>.Id));
         MethodCallExpression containsCall = Expression.Call(
@@ -108,7 +100,7 @@ public sealed class DataContext<TContext>(TContext context) : IDataContext<TCont
     public async Task RemoveEntity<T, TKey>(TKey id, CancellationToken ct = default)
         where T : class, IEntityValidator<TKey> where TKey : notnull
     {
-        // Idempotent on unknown id; deletion deferred until SaveChanges.
+
         T? entity = await context.Set<T>().FindAsync([id], ct);
 
         if (entity is not null)

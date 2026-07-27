@@ -6,16 +6,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace com.jobsite.chat.Api.Features.Auth;
 
-// JSON auth surface consumed by the SPA (spec §2.3). Hand-rolled (not AddIdentityApiEndpoints) so
-// the DisplayName-as-claim contract and the exact AuthUserDto shape stay under our control.
 public static class AuthEndpoints
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         RouteGroupBuilder group = app.MapGroup("/api/auth");
 
-        // Only the credential-submission endpoints get the strict per-IP limiter; /logout and /me stay
-        // on the global limiter (throttling them would penalise legitimate authenticated sessions).
         group.MapPost("/register", RegisterAsync).AllowAnonymous().RequireRateLimiting("auth");
         group.MapPost("/login", LoginAsync).AllowAnonymous().RequireRateLimiting("auth");
         group.MapPost("/logout", LogoutAsync).RequireAuthorization();
@@ -47,7 +43,7 @@ public static class AuthEndpoints
     {
         await userManager.AddClaimAsync(user, new Claim(AppClaimTypes.DisplayName, user.DisplayName));
         await signInManager.SignInAsync(user, isPersistent: false);
-        
+
         return Results.Ok(AuthUserDto.FromEntity(user));
     }
 

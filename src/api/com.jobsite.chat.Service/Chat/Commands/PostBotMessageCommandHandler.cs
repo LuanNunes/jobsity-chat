@@ -13,8 +13,6 @@ public sealed record PostBotMessageCommand(
     string BotDisplayName = MessageAuthor.DefaultBotName)
     : IRequest<ChatMessageDto>;
 
-// Bot replies re-enter as regular persisted messages (req. 4). Content is never
-// command-parsed; the entity trims it. Field validation via the domain factories.
 public sealed class PostBotMessageCommandHandler(
     IChatRoomRepository rooms,
     IChatMessageRepository messages,
@@ -31,9 +29,9 @@ public sealed class PostBotMessageCommandHandler(
         MessageAuthor author = MessageAuthor.Bot(request.BotDisplayName);
         NewChatMessageDto newChatMessageDto = NewChatMessageDto.Create(request.RoomId, author, request.Content, clock);
         ChatMessage message = ChatMessage.Create(newChatMessageDto);
-        
+
         await messages.AddAsync(message, cancellationToken);
-        
+
         return ChatMessageDto.FromEntity(message);
     }
 }

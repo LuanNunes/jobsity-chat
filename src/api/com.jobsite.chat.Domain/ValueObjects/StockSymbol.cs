@@ -2,15 +2,13 @@ using System.Text.RegularExpressions;
 
 namespace com.jobsite.chat.Domain.ValueObjects;
 
-// Normalized stock symbol value object (e.g. "aapl.us"). Non-throwing creation:
-// an invalid symbol is an expected parse outcome, not a violated invariant.
 public sealed partial record StockSymbol
 {
     private const int MaxLength = 20;
 
     private StockSymbol(string value) => Value = value;
 
-    public string Value { get; }  // normalized lowercase, e.g. "aapl.us"
+    public string Value { get; }
 
     public static bool TryCreate(string? raw, out StockSymbol? symbol)
     {

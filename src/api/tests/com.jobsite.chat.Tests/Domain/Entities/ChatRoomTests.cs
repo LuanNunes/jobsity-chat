@@ -3,7 +3,6 @@ using com.jobsite.chat.Domain.Exceptions;
 
 namespace com.jobsite.chat.Tests.Domain.Entities;
 
-// Behavior 18: ChatRoom.Create.
 public class ChatRoomTests
 {
     private static readonly DateTimeOffset CreatedAt = new(2026, 7, 25, 12, 0, 0, TimeSpan.Zero);
@@ -40,7 +39,6 @@ public class ChatRoomTests
         Assert.Equal(name, room.Name);
     }
 
-    // rev. 3 spec §4.4 — trim precedes validation: padded 100-char name passes and stores trimmed.
     [Fact]
     public void Create_PaddedNameExactly100AfterTrim_SucceedsWithLength100()
     {

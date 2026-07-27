@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Every value is required from the "RabbitMq" configuration section. Properties are init-only
-// (immutable, but writable by the configuration binder); a missing or blank value fails
-// validation at startup via ValidateDataAnnotations + ValidateOnStart in AddRabbitMqCore.
 public sealed record RabbitMqOptions
 {
     public const string SectionName = "RabbitMq";

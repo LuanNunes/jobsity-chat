@@ -3,13 +3,11 @@ using com.jobsite.chat.Api.Infrastructure.Identity;
 
 namespace com.jobsite.chat.Tests.Api.Infrastructure.Identity;
 
-// Spec §2.4 / §4.1: ToChatAuthor is the ONLY trusted source of sender identity.
 public class ClaimsPrincipalExtensionsTests
 {
     private static ClaimsPrincipal PrincipalWith(params Claim[] claims)
         => new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "TestAuth"));
 
-    // returns (userId, displayName) when both claims present.
     [Fact]
     public void ToChatAuthor_BothClaimsPresent_ReturnsUserIdAndDisplayName()
     {
@@ -23,7 +21,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Equal("Ana", displayName);
     }
 
-    // throws InvalidOperationException when NameIdentifier missing.
     [Fact]
     public void ToChatAuthor_NameIdentifierMissing_ThrowsInvalidOperationException()
     {
@@ -33,7 +30,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Throws<InvalidOperationException>(() => principal.ToChatAuthor());
     }
 
-    // throws when DisplayName claim missing.
     [Fact]
     public void ToChatAuthor_DisplayNameMissing_ThrowsInvalidOperationException()
     {
@@ -43,7 +39,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Throws<InvalidOperationException>(() => principal.ToChatAuthor());
     }
 
-    // throws when DisplayName claim is whitespace.
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
@@ -56,7 +51,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Throws<InvalidOperationException>(() => principal.ToChatAuthor());
     }
 
-    // throws when userId claim is whitespace.
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
@@ -69,7 +63,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Throws<InvalidOperationException>(() => principal.ToChatAuthor());
     }
 
-    // reads ClaimTypes.NameIdentifier specifically, NOT ClaimTypes.Name.
     [Fact]
     public void ToChatAuthor_UsesNameIdentifierNotName()
     {
@@ -83,7 +76,6 @@ public class ClaimsPrincipalExtensionsTests
         Assert.Equal("the-id-claim", userId);
     }
 
-    // when only ClaimTypes.Name (no NameIdentifier) is present, still throws (does not fall back to Name).
     [Fact]
     public void ToChatAuthor_OnlyNameClaimNoNameIdentifier_ThrowsInvalidOperationException()
     {

@@ -3,9 +3,6 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Bot.Stock;
 
-// Parses stooq's quote CSV (Symbol,Date,Time,Open,High,Low,Close,Volume; Close is index 6).
-// Vendor-specific, so it stays in the Bot; returns null when the symbol is unknown (Close = N/D)
-// or the body is malformed, yielding a Domain StockQuote otherwise.
 public static class StooqCsvParser
 {
     private const int CloseColumnIndex = 6;
@@ -34,7 +31,6 @@ public static class StooqCsvParser
             : new StockQuote(symbol, closeValue);
     }
 
-    // Skip the header, tolerate CRLF / blank lines / surrounding whitespace, return the first data row's fields.
     private static IReadOnlyList<string> ExtractDataRowFields(string csv)
     {
         string[] lines = csv.Split('\n');

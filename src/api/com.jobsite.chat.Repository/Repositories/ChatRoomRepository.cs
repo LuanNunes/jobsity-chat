@@ -8,8 +8,7 @@ namespace com.jobsite.chat.Repository.Repositories;
 
 public sealed class ChatRoomRepository(IDataContext<ChatDbContext> data) : IChatRoomRepository
 {
-    // Compat ctor: keeps existing `new ChatRoomRepository(context)` call sites compiling.
-    // Delegates to the primary ctor (one code path).
+
     public ChatRoomRepository(ChatDbContext db) : this(new DataContext<ChatDbContext>(db)) { }
 
     public Task<bool> ExistsAsync(Guid roomId, CancellationToken ct) =>

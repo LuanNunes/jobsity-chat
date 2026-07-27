@@ -11,12 +11,10 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace com.jobsite.chat.Tests.Repository;
 
-// Spec §4 behaviors 9-20: ChatMessageRepository against SQLite in-memory.
 public sealed class ChatMessageRepositoryTests
 {
     private static readonly DateTimeOffset BaseTime = new(2026, 7, 25, 12, 0, 0, TimeSpan.Zero);
 
-    // Builds a ChatMessage with a controlled SentAtUtc via FakeTimeProvider + the domain factory.
     private static ChatMessage NewUserMessage(Guid roomId, string content, DateTimeOffset sentAt, string userId = "user-1", string displayName = "Ana")
     {
         FakeTimeProvider clock = new(sentAt);
@@ -41,7 +39,6 @@ public sealed class ChatMessageRepositoryTests
         }
     }
 
-    // Behavior 9: AddAsync persists immediately; a second context on the same connection sees the message.
     [Fact]
     public async Task AddAsync_PersistedMessage_IsVisibleFromSecondContext()
     {
@@ -57,7 +54,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.NotNull(persisted);
     }
 
-    // Behavior 10: User-message round-trip preserves all fields; IsBot false — proves owned-type mapping + ctor rebinding.
     [Fact]
     public async Task GetLatestAsync_UserMessageRoundTrip_PreservesAllFields()
     {
@@ -81,7 +77,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.False(persisted.Author.IsBot);
     }
 
-    // Behavior 11: Bot-message round-trip — Author.UserId null, IsBot true, DisplayName "StockBot" (nullable owned column).
     [Fact]
     public async Task GetLatestAsync_BotMessageRoundTrip_PreservesNullUserIdAndIsBot()
     {
@@ -101,7 +96,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Equal("StockBot", persisted.Author.DisplayName);
     }
 
-    // Behavior 12: GetLatestAsync for an unknown room and for Guid.Empty -> empty list.
     [Fact]
     public async Task GetLatestAsync_UnknownRoom_ReturnsEmptyList()
     {
@@ -115,7 +109,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Empty(result);
     }
 
-    // Behavior 12 (companion): Guid.Empty room -> empty list.
     [Fact]
     public async Task GetLatestAsync_GuidEmptyRoom_ReturnsEmptyList()
     {
@@ -129,7 +122,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Empty(result);
     }
 
-    // Behavior 13: More than `count` messages -> exactly `count`, the NEWEST (oldest excluded).
     [Fact]
     public async Task GetLatestAsync_MoreThanCount_ReturnsNewestCountOnly()
     {
@@ -151,7 +143,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Contains(result, m => m.Id == newest.Id);
     }
 
-    // Behavior 14: Returned window is ASCENDING by SentAtUtc (inserted shuffled).
     [Fact]
     public async Task GetLatestAsync_ShuffledInserts_ReturnsAscendingBySentAtUtc()
     {
@@ -175,7 +166,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Equal(fourth.Id, result[3].Id);
     }
 
-    // Behavior 15: Fewer than `count` messages -> all of them, ascending.
     [Fact]
     public async Task GetLatestAsync_FewerThanCount_ReturnsAllAscending()
     {
@@ -195,23 +185,18 @@ public sealed class ChatMessageRepositoryTests
         Assert.Equal(second.Id, result[1].Id);
     }
 
-    // Behavior 16: Identical SentAtUtc -> ordered by Id ascending. The test can't control the
-    // Id (ChatMessage.Create generates it), and two back-to-back Guid.CreateVersion7() calls are
-    // NOT guaranteed monotonic within the same millisecond, so we DERIVE the expected order from
-    // the actual ids rather than asserting a creation-order precondition.
     [Fact]
     public async Task GetLatestAsync_IdenticalSentAtUtc_OrdersByIdAscending()
     {
         using SqliteInMemoryFixture fixture = new();
         Guid roomId = Guid.CreateVersion7();
-        // Same timestamp; whichever id is smaller must come first regardless of creation order.
+
         ChatMessage messageA = NewUserMessage(roomId, "a", BaseTime);
         ChatMessage messageB = NewUserMessage(roomId, "b", BaseTime);
 
         ChatMessage smallerId = messageA.Id.CompareTo(messageB.Id) < 0 ? messageA : messageB;
         ChatMessage largerId = ReferenceEquals(smallerId, messageA) ? messageB : messageA;
 
-        // Insert larger-id first to prove ordering is by Id, not insert order.
         await AddMessagesAsync(fixture, largerId, smallerId);
 
         await using ChatDbContext readContext = fixture.NewChatContext();
@@ -223,7 +208,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Equal(largerId.Id, result[1].Id);
     }
 
-    // Behavior 17: Messages of other rooms are excluded.
     [Fact]
     public async Task GetLatestAsync_OtherRoomsPresent_ExcludesThem()
     {
@@ -243,7 +227,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Equal(mine.Id, only.Id);
     }
 
-    // Behavior 18: count == 0 -> empty list (SQLite LIMIT -1 regression guard).
     [Fact]
     public async Task GetLatestAsync_CountZero_ReturnsEmptyList()
     {
@@ -259,7 +242,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Empty(result);
     }
 
-    // Behavior 18 (companion): count < 0 -> empty list.
     [Fact]
     public async Task GetLatestAsync_CountNegative_ReturnsEmptyList()
     {
@@ -275,7 +257,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Empty(result);
     }
 
-    // Behavior 19: GetLatestAsync leaves the change tracker empty (no-tracking reads).
     [Fact]
     public async Task GetLatestAsync_AfterRead_LeavesChangeTrackerEmpty()
     {
@@ -290,7 +271,6 @@ public sealed class ChatMessageRepositoryTests
         Assert.Empty(readContext.ChangeTracker.Entries());
     }
 
-    // Behavior 20: Rehydration bypasses validation — a raw 1001-char row round-trips WITHOUT throwing DomainException.
     [Fact]
     public async Task GetLatestAsync_RowExceedingDomainMaxLength_RoundTripsWithoutDomainException()
     {
@@ -304,8 +284,7 @@ public sealed class ChatMessageRepositoryTests
             insert.CommandText =
                 "INSERT INTO Messages (Id, RoomId, Content, SentAtUtc, AuthorUserId, AuthorDisplayName) " +
                 "VALUES ($id, $roomId, $content, $sentAt, $userId, $displayName)";
-            // EF Core's SQLite provider stores Guids as UPPERCASE TEXT under case-sensitive BINARY
-            // collation; match that format so the repository's parameterized WHERE finds this row.
+
             insert.Parameters.AddWithValue("$id", messageId.ToString().ToUpperInvariant());
             insert.Parameters.AddWithValue("$roomId", roomId.ToString().ToUpperInvariant());
             insert.Parameters.AddWithValue("$content", oversizedContent);

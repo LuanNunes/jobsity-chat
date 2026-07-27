@@ -13,8 +13,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => router,
 }));
 
-// A controllable fake HubConnection; the test drives server->client events
-// through the captured client handlers.
 const hub = vi.hoisted(() => {
   return {
     connection: null as unknown as {
@@ -137,7 +135,7 @@ describe("ChatPage", () => {
 
   it("appends a broadcast RoomCreated room to the sidebar", async () => {
     render(<ChatPage />);
-    // Wait for the initial room list to render before driving the broadcast.
+
     await screen.findByRole("button", { name: "General" });
 
     await act(async () => {
@@ -151,8 +149,6 @@ describe("ChatPage", () => {
     render(<ChatPage />);
     await screen.findByRole("button", { name: "General" });
 
-    // The creator already appended this room locally (from the POST response); the Clients.All
-    // broadcast for the same id must be deduped, not re-added.
     await act(async () => {
       hub.handlers.onRoomCreated({ id: "r1", name: "General" });
     });
@@ -165,12 +161,10 @@ describe("ChatPage", () => {
     render(<ChatPage />);
     await screen.findByRole("button", { name: "General" });
 
-    // The Clients.All broadcast reaches the creator first...
     await act(async () => {
       hub.handlers.onRoomCreated({ id: "r2", name: "Random" });
     });
 
-    // ...then the creator's own POST resolves and appends the same room.
     await userEvent.type(
       screen.getByPlaceholderText("New room name"),
       "Random"
@@ -188,7 +182,6 @@ describe("ChatPage", () => {
     render(<ChatPage />);
     await screen.findByRole("button", { name: "General" });
 
-    // The creator's own POST resolves first and appends the room...
     await userEvent.type(
       screen.getByPlaceholderText("New room name"),
       "Random"
@@ -198,7 +191,6 @@ describe("ChatPage", () => {
       expect(api.createRoom).toHaveBeenCalledWith("Random")
     );
 
-    // ...then the Clients.All broadcast for the same id arrives and must be deduped.
     await act(async () => {
       hub.handlers.onRoomCreated({ id: "r2", name: "Random" });
     });

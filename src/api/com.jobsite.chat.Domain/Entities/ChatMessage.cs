@@ -6,8 +6,6 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Domain.Entities;
 
-// Core chat message entity; private ctor + static factory. EF Core materializes via
-// the private ctor, bypassing the factory guards.
 public sealed class ChatMessage : IEntityValidator<Guid>
 {
     private const int MaxContentLength = 1000;
@@ -21,13 +19,12 @@ public sealed class ChatMessage : IEntityValidator<Guid>
         SentAtUtc = sentAtUtc;
     }
 
-    // EF Core materialization only; EF cannot constructor-bind the Author navigation.
     private ChatMessage() { Author = null!; Content = null!; }
 
     public Guid Id { get; }
     public Guid RoomId { get; }
-    public MessageAuthor Author { get; }  // EF maps as owned/complex type later
-    public string Content { get; }        // trimmed
+    public MessageAuthor Author { get; }
+    public string Content { get; }
     public DateTimeOffset SentAtUtc { get; }
 
     private static readonly InlineValidator<ChatMessage> Rules = new()

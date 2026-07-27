@@ -7,7 +7,6 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace com.jobsite.chat.Tests.Service.Chat.Rooms;
 
-// Behaviors 32–33: CreateRoomCommandHandler.
 public class CreateRoomCommandHandlerTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 7, 25, 10, 30, 0, TimeSpan.Zero);
@@ -18,7 +17,6 @@ public class CreateRoomCommandHandlerTests
     private CreateRoomCommandHandler CreateHandler()
         => new(_rooms, _clock);
 
-    // Behavior 32
     [Fact]
     public async Task Handle_ValidName_AddsRoomAndReturnsDto()
     {
@@ -32,7 +30,6 @@ public class CreateRoomCommandHandlerTests
         Assert.Equal("General", dto.Name);
     }
 
-    // Behavior 33
     [Fact]
     public async Task Handle_EmptyName_ThrowsDomainExceptionAndDoesNotAdd()
     {
@@ -43,7 +40,6 @@ public class CreateRoomCommandHandlerTests
         Assert.Equal(0, _rooms.AddAsyncCallCount);
     }
 
-    // Behavior 33
     [Fact]
     public async Task Handle_NameLongerThan100_ThrowsDomainExceptionAndDoesNotAdd()
     {
@@ -54,8 +50,6 @@ public class CreateRoomCommandHandlerTests
         Assert.Equal(0, _rooms.AddAsyncCallCount);
     }
 
-    // Duplicate-name rejection: a room named "General" already exists; creating "general"
-    // (different case) must be rejected with DomainException and must not add a second room.
     [Fact]
     public async Task Handle_DuplicateNameDifferentCase_ThrowsDomainExceptionAndDoesNotAdd()
     {
@@ -69,7 +63,6 @@ public class CreateRoomCommandHandlerTests
         Assert.Empty(_rooms.Added);
     }
 
-    // Duplicate detection is trim-insensitive: input "  General  " collides with stored "General".
     [Fact]
     public async Task Handle_DuplicateNameWithSurroundingWhitespace_ThrowsDomainExceptionAndDoesNotAdd()
     {
@@ -83,7 +76,6 @@ public class CreateRoomCommandHandlerTests
         Assert.Empty(_rooms.Added);
     }
 
-    // The rejection message surfaces the incoming trimmed name (case as typed) so the API/UI can show it.
     [Fact]
     public async Task Handle_DuplicateName_ThrowsWithNameInMessage()
     {
@@ -93,12 +85,10 @@ public class CreateRoomCommandHandlerTests
         DomainException exception = await Assert.ThrowsAsync<DomainException>(
             () => handler.Handle(new CreateRoomCommand("general"), CancellationToken.None));
 
-        // Message echoes the INCOMING trimmed name ("general"), not the stored original casing.
         Assert.Contains("general", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("already exists", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // A unique name is still created even when other rooms already exist.
     [Fact]
     public async Task Handle_UniqueNameWithExistingRooms_AddsRoom()
     {

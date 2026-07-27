@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 
 namespace com.jobsite.chat.Tests.Api.Integration;
 
-// Integration specs for the JSON auth endpoints (spec §2.3, §7.2). The boot IS the coverage:
-// real Identity, real cookie scheme, real MediatR. These fail RED today because the current host
-// is Razor-based and exposes no /api/auth/* endpoints (404 != asserted status).
 public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
 {
     private readonly ApiWebApplicationFactory _factory;
@@ -20,8 +17,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         _factory = factory;
     }
 
-    // A client that does NOT auto-follow redirects, so a 302 (the bug we guard against) is
-    // observable rather than transparently followed. Cookie handling stays on for the auth flow.
     private HttpClient NewClient() =>
         _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
         {
@@ -31,7 +26,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
     private static object NewRegisterBody(string email, string displayName, string password) =>
         new { email, displayName, password };
 
-    // §7.2 #1: register valid -> 200 + Set-Cookie + AuthUserDto JSON.
     [Fact]
     public async Task Register_ValidRequest_Returns200WithAuthCookieAndUserJson()
     {
@@ -50,7 +44,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Equal("Alice", body.GetProperty("displayName").GetString());
     }
 
-    // §7.2 #1 (tail): after register the cookie authenticates a follow-up request.
     [Fact]
     public async Task Register_ThenAuthedRequest_Succeeds()
     {
@@ -65,8 +58,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Equal(HttpStatusCode.OK, rooms.StatusCode);
     }
 
-    // §7.2 #2: /me with the register cookie -> 200 with the same {id,email,displayName}
-    // (proves the display_name claim rides the cookie).
     [Fact]
     public async Task Me_WithRegisterCookie_ReturnsSameUserJson()
     {
@@ -83,7 +74,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Equal("Carol", body.GetProperty("displayName").GetString());
     }
 
-    // §7.2 #3: duplicate email -> 400 with error text, no cookie.
     [Fact]
     public async Task Register_DuplicateEmail_Returns400WithoutCookie()
     {
@@ -101,7 +91,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.False(string.IsNullOrWhiteSpace(content));
     }
 
-    // §7.2 #3: weak password -> 400 with errors, no cookie.
     [Fact]
     public async Task Register_WeakPassword_Returns400WithErrors()
     {
@@ -117,7 +106,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.False(string.IsNullOrWhiteSpace(content));
     }
 
-    // §7.2 #4: login correct creds -> 200 + cookie.
     [Fact]
     public async Task Login_ValidCredentials_Returns200WithCookie()
     {
@@ -134,7 +122,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Contains(response.Headers, header => header.Key == "Set-Cookie");
     }
 
-    // §7.2 #4: wrong password -> 401.
     [Fact]
     public async Task Login_WrongPassword_Returns401()
     {
@@ -150,7 +137,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    // §7.2 #4: unknown email -> 401.
     [Fact]
     public async Task Login_UnknownEmail_Returns401()
     {
@@ -163,7 +149,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    // §7.2 #5: /me without cookie -> 401 and NO Location header (401-not-302).
     [Fact]
     public async Task Me_WithoutCookie_Returns401AndNoLocationHeader()
     {
@@ -175,7 +160,6 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
         Assert.Null(response.Headers.Location);
     }
 
-    // §7.2 #5: logout (authed) -> 204 and clears the cookie; then /me -> 401.
     [Fact]
     public async Task Logout_WhenAuthed_Returns204ClearsCookieAndSubsequentMeIs401()
     {
@@ -186,7 +170,7 @@ public sealed class AuthEndpointsTests : IClassFixture<ApiWebApplicationFactory>
 
         HttpResponseMessage logout = await client.PostAsync("/api/auth/logout", content: null);
         Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
-        // A logout clears the auth cookie via an expiring Set-Cookie header.
+
         Assert.Contains(logout.Headers, header => header.Key == "Set-Cookie");
 
         HttpResponseMessage me = await client.GetAsync("/api/auth/me");

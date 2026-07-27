@@ -3,7 +3,6 @@ using com.jobsite.chat.Shared.Contracts;
 
 namespace com.jobsite.chat.Tests.Service.Fakes;
 
-// Hand-rolled fake recording published requests.
 public sealed class FakeStockQuoteRequestPublisher : IStockQuoteRequestPublisher
 {
     public List<StockQuoteRequestDto> Published { get; } = new();

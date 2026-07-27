@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace com.jobsite.chat.Tests.Api.Exceptions;
 
-// Unit spec for the rooms-group endpoint filter (spec §2.4): DomainException -> 400 problem+json;
-// any other result or exception passes through untouched.
 public sealed class DomainExceptionEndpointFilterTests
 {
     private static EndpointFilterInvocationContext NewContext()

@@ -17,7 +17,7 @@ public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMess
 
         builder.OwnsOne(m => m.Author, owned =>
         {
-            owned.Property(a => a.UserId).HasColumnName("AuthorUserId").HasMaxLength(450);      // nullable
+            owned.Property(a => a.UserId).HasColumnName("AuthorUserId").HasMaxLength(450);
             owned.Property(a => a.DisplayName).HasColumnName("AuthorDisplayName").HasMaxLength(100).IsRequired();
         });
         builder.Navigation(m => m.Author).IsRequired();

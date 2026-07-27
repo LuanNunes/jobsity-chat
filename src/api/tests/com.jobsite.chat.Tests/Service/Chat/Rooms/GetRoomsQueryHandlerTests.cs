@@ -5,7 +5,6 @@ using com.jobsite.chat.Tests.Service.Fakes;
 
 namespace com.jobsite.chat.Tests.Service.Chat.Rooms;
 
-// Behavior 34: GetRoomsQueryHandler.
 public class GetRoomsQueryHandlerTests
 {
     private readonly FakeChatRoomRepository _rooms = new();
@@ -13,7 +12,6 @@ public class GetRoomsQueryHandlerTests
     private GetRoomsQueryHandler CreateHandler()
         => new(_rooms);
 
-    // Behavior 34
     [Fact]
     public async Task Handle_MapsAllRoomsFromGetAllToDtos()
     {

@@ -7,12 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace com.jobsite.chat.Tests.Repository;
 
-// Spec §4 behaviors 1-8: ChatRoomRepository against SQLite in-memory.
 public sealed class ChatRoomRepositoryTests
 {
     private static readonly DateTimeOffset BaseTime = new(2026, 7, 25, 12, 0, 0, TimeSpan.Zero);
 
-    // Behavior 1: AddAsync persists immediately; a second context on the same connection sees the room.
     [Fact]
     public async Task AddAsync_PersistedRoom_IsVisibleFromSecondContext()
     {
@@ -31,7 +29,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.NotNull(persisted);
     }
 
-    // Behavior 2: Room round-trip preserves Id, Name, CreatedAtUtc (offset zero — validates UtcTicks converter).
     [Fact]
     public async Task AddAsync_RoundTrip_PreservesIdNameAndCreatedAtUtc()
     {
@@ -53,7 +50,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.Equal(TimeSpan.Zero, persisted.CreatedAtUtc.Offset);
     }
 
-    // Behavior 3: ExistsAsync -> true for a persisted id.
     [Fact]
     public async Task ExistsAsync_PersistedRoom_ReturnsTrue()
     {
@@ -73,7 +69,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.True(exists);
     }
 
-    // Behavior 4: ExistsAsync -> false for an unknown id.
     [Fact]
     public async Task ExistsAsync_UnknownRoom_ReturnsFalse()
     {
@@ -86,7 +81,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.False(exists);
     }
 
-    // Behavior 5: ExistsAsync(Guid.Empty) -> false (by contract).
     [Fact]
     public async Task ExistsAsync_GuidEmpty_ReturnsFalse()
     {
@@ -99,7 +93,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.False(exists);
     }
 
-    // Behavior 6: GetAllAsync on empty DB -> empty list (not null).
     [Fact]
     public async Task GetAllAsync_EmptyDatabase_ReturnsEmptyListNotNull()
     {
@@ -113,7 +106,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.Empty(rooms);
     }
 
-    // Behavior 7: GetAllAsync returns all rooms ordered by CreatedAtUtc ascending (inserted out of order).
     [Fact]
     public async Task GetAllAsync_MultipleRooms_ReturnsAllOrderedByCreatedAtUtcAscending()
     {
@@ -140,7 +132,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.Equal(newest.Id, rooms[2].Id);
     }
 
-    // Duplicate-name feature: ExistsByNameAsync is trim + case-insensitive against stored names.
     [Fact]
     public async Task ExistsByNameAsync_StoredNameQueriedWithDifferentCaseAndWhitespace_ReturnsTrue()
     {
@@ -160,7 +151,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.True(exists);
     }
 
-    // ExistsByNameAsync returns false when no room with that name exists.
     [Fact]
     public async Task ExistsByNameAsync_NoSuchName_ReturnsFalse()
     {
@@ -180,7 +170,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.False(exists);
     }
 
-    // ExistsByNameAsync on an empty database returns false.
     [Fact]
     public async Task ExistsByNameAsync_EmptyDatabase_ReturnsFalse()
     {
@@ -193,7 +182,6 @@ public sealed class ChatRoomRepositoryTests
         Assert.False(exists);
     }
 
-    // Behavior 8: GetAllAsync leaves the change tracker empty (no-tracking reads).
     [Fact]
     public async Task GetAllAsync_AfterRead_LeavesChangeTrackerEmpty()
     {

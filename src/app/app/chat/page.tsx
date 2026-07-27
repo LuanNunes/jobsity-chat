@@ -20,7 +20,6 @@ export default function ChatPage() {
   const activeRoomRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Bootstrap: verify auth, load rooms, open the hub connection.
   useEffect(() => {
     let disposed: boolean = false;
 

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Publishes a formatted stock-quote reply to the replies queue.
 internal sealed class RabbitMqStockQuoteReplyPublisher(
     RabbitMqPublisher publisher,
     IOptions<RabbitMqOptions> options)

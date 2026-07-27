@@ -3,10 +3,9 @@ using com.jobsite.chat.Domain.Rules;
 
 namespace com.jobsite.chat.Tests.Domain.Rules;
 
-// Behaviors 5–12: ChatCommandParser.Parse.
 public class ChatCommandParserTests
 {
-    // Behavior 5
+
     [Fact]
     public void Parse_StockCommand_ReturnsStockCommandWithSymbol()
     {
@@ -16,7 +15,6 @@ public class ChatCommandParserTests
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
 
-    // Behavior 6
     [Fact]
     public void Parse_UpperCasePrefixAndSymbol_NormalizesToLowercaseStockCommand()
     {
@@ -26,7 +24,6 @@ public class ChatCommandParserTests
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
 
-    // Behavior 7
     [Fact]
     public void Parse_LeadingAndTrailingWhitespace_TrimsAndReturnsStockCommand()
     {
@@ -36,7 +33,6 @@ public class ChatCommandParserTests
         Assert.Equal("aapl.us", result.Symbol!.Value);
     }
 
-    // Behavior 8
     [Theory]
     [InlineData("/stock=")]
     [InlineData("/stock")]
@@ -47,10 +43,9 @@ public class ChatCommandParserTests
         Assert.Null(result.Symbol);
     }
 
-    // Behavior 9
     [Theory]
     [InlineData("/stock=aapl us")]
-    [InlineData("/stock=abcdefghijklmnopqrstu")] // 21-char symbol
+    [InlineData("/stock=abcdefghijklmnopqrstu")]
     public void Parse_StockCommandWithInvalidSymbol_ReturnsUnknownCommand(string input)
     {
         ChatCommandParseResult result = ChatCommandParser.Parse(input);
@@ -58,7 +53,6 @@ public class ChatCommandParserTests
         Assert.Null(result.Symbol);
     }
 
-    // Behavior 10
     [Fact]
     public void Parse_UnknownSlashCommand_ReturnsUnknownCommand()
     {
@@ -67,7 +61,6 @@ public class ChatCommandParserTests
         Assert.Null(result.Symbol);
     }
 
-    // Behavior 11
     [Fact]
     public void Parse_PlainText_ReturnsPlainMessage()
     {
@@ -76,7 +69,6 @@ public class ChatCommandParserTests
         Assert.Null(result.Symbol);
     }
 
-    // Behavior 11
     [Fact]
     public void Parse_SlashNotFirstChar_ReturnsPlainMessage()
     {
@@ -85,7 +77,6 @@ public class ChatCommandParserTests
         Assert.Null(result.Symbol);
     }
 
-    // Behavior 12
     [Theory]
     [InlineData(null)]
     [InlineData("")]

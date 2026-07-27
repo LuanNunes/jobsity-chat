@@ -11,7 +11,6 @@ using NSubstitute;
 
 namespace com.jobsite.chat.Tests.Api.Features.Chat;
 
-// Spec §2.3 / §4.1: the crown-jewel outcome->client-signal mapping. Hub derives identity from Context.User only.
 public class ChatHubTests
 {
     private const string ConnectionId = "conn-123";
@@ -52,7 +51,6 @@ public class ChatHubTests
 
     private static string GroupName(Guid roomId) => $"room:{roomId}";
 
-    // SendMessage MessagePersisted -> Clients.Group(GroupName).ReceiveMessage(dto) once; caller methods NOT called.
     [Fact]
     public async Task SendMessage_MessagePersisted_BroadcastsDtoToRoomGroupOnly()
     {
@@ -72,7 +70,6 @@ public class ChatHubTests
         await _callerClient.DidNotReceive().CommandRejected(Arg.Any<string>());
     }
 
-    // SendMessage StockCommandQueued -> Clients.Caller.CommandAccepted(stockCode) once; no broadcast.
     [Fact]
     public async Task SendMessage_StockCommandQueued_AcksCallerNoBroadcast()
     {
@@ -89,7 +86,6 @@ public class ChatHubTests
         await _callerClient.DidNotReceive().CommandRejected(Arg.Any<string>());
     }
 
-    // SendMessage UnknownCommandRejected -> Clients.Caller.CommandRejected once; no broadcast.
     [Fact]
     public async Task SendMessage_UnknownCommandRejected_RejectsCallerNoBroadcast()
     {
@@ -106,7 +102,6 @@ public class ChatHubTests
         await _callerClient.DidNotReceive().CommandAccepted(Arg.Any<string>());
     }
 
-    // SendMessage builds SendMessageCommand with author from Context.User (NOT client params); hub has no author param.
     [Fact]
     public async Task SendMessage_BuildsCommandWithAuthorFromContextUser()
     {
@@ -127,7 +122,6 @@ public class ChatHubTests
             Arg.Any<CancellationToken>());
     }
 
-    // JoinRoom -> Groups.AddToGroupAsync(connId, "room:{id}") + Clients.Caller.LoadHistory(history); order preserved.
     [Fact]
     public async Task JoinRoom_AddsToGroupAndLoadsHistoryToCaller()
     {
@@ -147,7 +141,6 @@ public class ChatHubTests
             list != null && list.Count == 2 && list[0] == older && list[1] == newer));
     }
 
-    // JoinRoom queries GetLatestMessagesQuery for the joined room.
     [Fact]
     public async Task JoinRoom_QueriesLatestMessagesForRoom()
     {
@@ -163,7 +156,6 @@ public class ChatHubTests
             Arg.Any<CancellationToken>());
     }
 
-    // JoinRoom uses the exact "room:{roomId}" group-name format.
     [Fact]
     public async Task JoinRoom_UsesRoomColonGuidGroupNameFormat()
     {
@@ -178,7 +170,6 @@ public class ChatHubTests
             Arg.Any<string>(), $"room:{roomId}", Arg.Any<CancellationToken>());
     }
 
-    // LeaveRoom -> Groups.RemoveFromGroupAsync(connId, "room:{id}").
     [Fact]
     public async Task LeaveRoom_RemovesFromGroup()
     {

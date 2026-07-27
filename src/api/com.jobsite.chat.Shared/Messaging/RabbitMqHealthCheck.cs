@@ -4,8 +4,6 @@ using RabbitMQ.Client;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Readiness probe for the shared RabbitMQ connection: opens (or reuses) the connection and reports
-// Healthy only when the broker connection is open. Any failure (broker down, auth error) -> Unhealthy.
 internal sealed class RabbitMqHealthCheck(IRabbitMqConnection connection) : IHealthCheck
 {
     public async Task<HealthCheckResult> CheckHealthAsync(

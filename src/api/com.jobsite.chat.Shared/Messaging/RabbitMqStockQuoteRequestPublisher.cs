@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Publishes a stock-quote request to the requests queue.
 internal sealed class RabbitMqStockQuoteRequestPublisher(
     RabbitMqPublisher publisher,
     IOptions<RabbitMqOptions> options)

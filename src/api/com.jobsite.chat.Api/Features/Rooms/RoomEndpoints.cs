@@ -9,8 +9,6 @@ using Microsoft.Extensions.Logging;
 
 namespace com.jobsite.chat.Api.Features.Rooms;
 
-// JSON rooms surface (spec §2.4). The whole group requires auth; DomainException from the room-name
-// factory is converted to 400 problem+json by the group's DomainExceptionEndpointFilter.
 public static class RoomEndpoints
 {
     public static IEndpointRouteBuilder MapRoomEndpoints(this IEndpointRouteBuilder app)
@@ -39,7 +37,6 @@ public static class RoomEndpoints
     {
         ChatRoomDto room = await mediator.Send(command);
 
-        // The room is already persisted; a broadcast failure must not fail the create.
         try
         {
             await hub.Clients.All.RoomCreated(room);

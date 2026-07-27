@@ -6,10 +6,6 @@ using RabbitMQ.Client.Events;
 
 namespace com.jobsite.chat.Shared.Messaging;
 
-// Template for a durable-queue consumer: connect-until-ready, declare the queue with QoS,
-// consume with manual ack, and dispose the channel on stop. Subclasses supply the queue name
-// (via the base ctor) and the per-message work in ProcessAsync; the base acks on success and
-// nacks (no requeue) when ProcessAsync throws.
 public abstract class RabbitMqQueueConsumer(IRabbitMqConnection connection, string queueName, ILogger logger)
     : BackgroundService
 {
@@ -20,7 +16,6 @@ public abstract class RabbitMqQueueConsumer(IRabbitMqConnection connection, stri
 
     protected ILogger Logger { get; } = logger;
 
-    // Handle one message. Return to acknowledge; throw to reject (nack, no requeue).
     protected abstract Task ProcessAsync(ReadOnlyMemory<byte> body, CancellationToken ct);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

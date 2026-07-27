@@ -9,8 +9,6 @@ using Microsoft.Extensions.Options;
 
 namespace com.jobsite.chat.Bot.Consumers;
 
-// Consumes stock-quote requests, fetches + parses the stooq CSV, formats a reply, and publishes it.
-// A failed deserialize throws (base nacks, no requeue); HTTP failures still produce a room-visible reply.
 internal sealed class StockRequestConsumer(
     IRabbitMqConnection connection,
     IOptions<RabbitMqOptions> options,
@@ -24,11 +22,10 @@ internal sealed class StockRequestConsumer(
         StockQuoteRequestDto request =
             JsonSerializer.Deserialize<StockQuoteRequestDto>(body.Span, MessagingJson.Options)
             ?? throw new JsonException("Stock request payload deserialized to null.");
-        
+
         await HandleRequestAsync(request, ct);
     }
 
-    // Fetch -> parse -> format -> publish reply. HTTP failures after retries still produce a room-visible reply.
     private async Task HandleRequestAsync(StockQuoteRequestDto request, CancellationToken ct)
     {
         StockQuoteReply reply = await BuildReplyAsync(request, ct);
@@ -44,7 +41,7 @@ internal sealed class StockRequestConsumer(
             string text = quote is not null
                 ? quote.ToQuoteMessage()
                 : StockQuote.NotFoundMessage(request.StockCode);
-            
+
             return new StockQuoteReply(request.RoomId, text, quote is not null);
         }
         catch (HttpRequestException exception)

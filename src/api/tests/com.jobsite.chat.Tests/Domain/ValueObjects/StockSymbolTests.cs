@@ -2,7 +2,6 @@ using com.jobsite.chat.Domain.ValueObjects;
 
 namespace com.jobsite.chat.Tests.Domain.ValueObjects;
 
-// Behavior 13: StockSymbol.TryCreate.
 public class StockSymbolTests
 {
     [Fact]

@@ -5,10 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace com.jobsite.chat.Tests.Service;
 
-// DI contract (section 2 DependencyInjection): AddServiceLayer registers MediatR handlers
-// from this assembly and TimeProvider.System; no pipeline behaviors.
-// Asserts against the IServiceCollection descriptors (no container build — the test
-// project references only DI.Abstractions, not the full DI implementation).
 public class DependencyInjectionTests
 {
     [Fact]

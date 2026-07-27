@@ -11,8 +11,6 @@ using Microsoft.Extensions.Options;
 
 namespace com.jobsite.chat.Api.Infrastructure;
 
-// Consumes stock-quote replies, persists them as bot messages, and broadcasts to the room.
-// Singleton BackgroundService: resolves scoped IMediator from a per-message scope; IHubContext is singleton-safe.
 internal sealed class StockReplyConsumer : RabbitMqQueueConsumer
 {
     private readonly IServiceScopeFactory? _scopeFactory;
@@ -30,7 +28,6 @@ internal sealed class StockReplyConsumer : RabbitMqQueueConsumer
         _hub = hub;
     }
 
-    // Test seam: HandleReplyAsync needs only the hub; the broker plumbing (base) is not exercised here.
     internal StockReplyConsumer(IHubContext<ChatHub, IChatClient> hub) : base(null!, null!, null!) => _hub = hub;
 
     protected override async Task ProcessAsync(ReadOnlyMemory<byte> body, CancellationToken ct)
@@ -44,13 +41,11 @@ internal sealed class StockReplyConsumer : RabbitMqQueueConsumer
         }
         catch (RoomNotFoundException exception)
         {
-            // Expected: the room was deleted between the request and the reply. Drop (ack), don't error.
+
             Logger.LogWarning(exception, "Stock reply targeted a room that no longer exists; discarding.");
         }
     }
 
-    // Unit-testable per-message seam: mediator is passed in (resolved from a per-message scope by ProcessAsync).
-    // Deserialize the reply, dispatch PostBotMessageCommand(RoomId, BotText), broadcast the returned dto.
     internal async Task HandleReplyAsync(IMediator mediator, ReadOnlyMemory<byte> body, CancellationToken ct)
     {
         StockQuoteReply reply = JsonSerializer.Deserialize<StockQuoteReply>(body.Span, MessagingJson.Options)

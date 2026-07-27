@@ -16,10 +16,9 @@ public sealed record SendMessageCommand(
 
 public sealed record SendMessageResult(
     SendMessageOutcomeEnum OutcomeEnum,
-    ChatMessageDto? Message = null,    // set iff MessagePersisted
-    string? StockCode = null);         // set iff StockCommandQueued
+    ChatMessageDto? Message = null,
+    string? StockCode = null);
 
-// Room check -> parse -> branch. No field validation here: the domain factories throw.
 public sealed class SendMessageCommandHandler(
     IChatRoomRepository rooms,
     IChatMessageRepository messages,
@@ -50,7 +49,6 @@ public sealed class SendMessageCommandHandler(
                 Task.FromResult(new SendMessageResult(SendMessageOutcomeEnum.UnknownCommandRejected)),
         };
 
-        // Anything not explicitly handled (PlainMessage and any future kind) persists a plain message.
         return handlers.TryGetValue(parsed.KindEnum, out Func<Task<SendMessageResult>>? handler)
             ? await handler()
             : await PersistPlainMessageAsync(request, cancellationToken);

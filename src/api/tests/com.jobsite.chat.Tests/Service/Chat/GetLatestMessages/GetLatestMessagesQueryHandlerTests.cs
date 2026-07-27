@@ -6,7 +6,6 @@ using com.jobsite.chat.Tests.Service.Fakes;
 
 namespace com.jobsite.chat.Tests.Service.Chat.GetLatestMessages;
 
-// Behaviors 29–31: GetLatestMessagesQueryHandler.
 public class GetLatestMessagesQueryHandlerTests
 {
     private readonly FakeChatMessageRepository _messages = new();
@@ -14,7 +13,6 @@ public class GetLatestMessagesQueryHandlerTests
     private GetLatestMessagesQueryHandler CreateHandler()
         => new(_messages);
 
-    // Behavior 29
     [Fact]
     public async Task Handle_CallsGetLatestWithCountFifty()
     {
@@ -29,7 +27,6 @@ public class GetLatestMessagesQueryHandlerTests
         Assert.Equal(50, GetLatestMessagesQueryHandler.MessageLimit);
     }
 
-    // Behavior 30
     [Fact]
     public async Task Handle_MapsEntitiesToDtosPreservingOrderAndFields()
     {
@@ -57,7 +54,6 @@ public class GetLatestMessagesQueryHandlerTests
         Assert.Equal("second", result[1].Content);
     }
 
-    // Behavior 31
     [Fact]
     public async Task Handle_EmptyRepositoryResult_ReturnsEmptyListNoThrow()
     {
