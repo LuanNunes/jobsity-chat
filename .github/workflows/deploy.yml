@@ -1,0 +1,66 @@
+name: deploy
+
+# Auto-deploy to Cloud Run on every push to main. Keyless auth via Workload
+# Identity Federation — no service-account key is stored in the repo.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT: jobsity-chat-2616
+  REGION: us-central1
+  AR: us-central1-docker.pkg.dev/jobsity-chat-2616/app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: jobsity-chat-2616
+          workload_identity_provider: projects/41145227035/locations/global/workloadIdentityPools/github/providers/github
+          service_account: gh-deploy@jobsity-chat-2616.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+
+      - name: Build & push images
+        run: |
+          set -euo pipefail
+          TAG="${{ github.sha }}"
+          docker build -f src/api/com.jobsite.chat.Api/Dockerfile -t "$AR/api:$TAG" -t "$AR/api:latest" src/api
+          docker build -f src/api/com.jobsite.chat.Bot/Dockerfile -t "$AR/bot:$TAG" -t "$AR/bot:latest" src/api
+          docker build -f src/app/Dockerfile --build-arg NEXT_PUBLIC_API_URL="" -t "$AR/web:$TAG" -t "$AR/web:latest" src/app
+          docker build -f deploy/gateway/Dockerfile -t "$AR/gateway:$TAG" -t "$AR/gateway:latest" deploy/gateway
+          for svc in api bot web gateway; do docker push --all-tags "$AR/$svc"; done
+
+      - name: Deploy services
+        run: |
+          set -euo pipefail
+          TAG="${{ github.sha }}"
+          gcloud run deploy api --image "$AR/api:$TAG" --region "$REGION" \
+            --allow-unauthenticated --min-instances=1 --no-cpu-throttling --port=8080 --timeout=3600 --memory=512Mi \
+            --set-env-vars=ASPNETCORE_ENVIRONMENT=Production,ConnectionStrings__ChatDatabase="Data Source=/app/data/jobsity-chat.db" \
+            --set-secrets=RabbitMq__Uri=rabbitmq-uri:latest
+          gcloud run deploy bot --image "$AR/bot:$TAG" --region "$REGION" \
+            --no-allow-unauthenticated --min-instances=1 --no-cpu-throttling --port=8080 --memory=512Mi \
+            --set-env-vars=ASPNETCORE_ENVIRONMENT=Production \
+            --set-secrets=RabbitMq__Uri=rabbitmq-uri:latest
+          gcloud run deploy web --image "$AR/web:$TAG" --region "$REGION" \
+            --allow-unauthenticated --port=8080 --memory=512Mi
+          API_URL=$(gcloud run services describe api --region "$REGION" --format='value(status.url)')
+          WEB_URL=$(gcloud run services describe web --region "$REGION" --format='value(status.url)')
+          gcloud run deploy gateway --image "$AR/gateway:$TAG" --region "$REGION" \
+            --allow-unauthenticated --port=8080 --timeout=3600 --memory=256Mi \
+            --set-env-vars="API_UPSTREAM=${API_URL},API_HOST=${API_URL#https://},WEB_UPSTREAM=${WEB_URL},WEB_HOST=${WEB_URL#https://}"
+          echo "Deployed. Public URL: $(gcloud run services describe gateway --region "$REGION" --format='value(status.url)')"

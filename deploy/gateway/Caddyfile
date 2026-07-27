@@ -1,0 +1,23 @@
+# Single public origin for the Cloud Run deploy. Routes /api and /hubs (SignalR) to
+# the api service and everything else to the web service, so the SPA and the API share
+# one origin (first-party auth cookie, no CORS). Upstreams are injected as env at deploy.
+{
+	admin off
+}
+
+:{$PORT:8080}
+
+# API + SignalR hub -> api service (Host header set so Cloud Run routes correctly).
+@backend path /api/* /hubs/*
+handle @backend {
+	reverse_proxy {$API_UPSTREAM} {
+		header_up Host {$API_HOST}
+	}
+}
+
+# Everything else -> web (Next.js) service.
+handle {
+	reverse_proxy {$WEB_UPSTREAM} {
+		header_up Host {$WEB_HOST}
+	}
+}
